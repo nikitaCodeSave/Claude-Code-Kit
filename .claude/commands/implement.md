@@ -1,74 +1,122 @@
+---
+description: Implements current task from .claude-workspace/current-task.md using strict TDD. Use after plan is approved and ready for coding.
+allowed-tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob
+---
 # Implement Current Task
 
-Реализуй задачу из `.claude-workspace/current-task.md`.
+Реализуй задачу из `.claude-workspace/current-task.md` следуя TDD.
 
 ## Pre-Implementation Checklist
 
 ```bash
-# 1. Проверь текущую задачу
+# 1. Проверь что план существует
+if [ ! -f .claude-workspace/current-task.md ]; then
+  echo "ERROR: No plan found. Run /project:plan first."
+  exit 1
+fi
+
+# 2. Покажи текущую задачу
 cat .claude-workspace/current-task.md
 
-# 2. Проверь прогресс
-cat .claude-workspace/progress.md
+# 3. Проверь прогресс
+cat .claude-workspace/progress.md | tail -20
 
-# 3. Убедись что dev environment работает
-# [запусти dev server и проверь базовый функционал]
+# 4. Проверь git status
+git status --short
+
+# 5. Убедись что тесты проходят (baseline)
+npm test 2>&1 | tail -10 || pytest -v 2>&1 | tail -10
 ```
 
 ## Implementation Process
 
-### Для каждого шага из плана:
+### Для КАЖДОГО шага из плана:
 
-1. **Напиши тесты СНАЧАЛА (TDD)**
-   - Тест должен описывать expected behavior
-   - Запусти тест - он ДОЛЖЕН падать
-   - Это подтверждает что тест валидный
+#### 1. Write Test FIRST (RED)
+```bash
+# Создай тест описывающий expected behavior
+# Запусти - он ДОЛЖЕН УПАСТЬ
+npm test -- --grep "test name"
+```
 
-2. **Напиши минимальный код для прохождения теста**
-   - Не переусложняй
-   - Достаточно чтобы тест прошёл
+#### 2. Write Minimal Code (GREEN)
+```bash
+# Напиши минимум кода для прохождения теста
+# Запусти - ДОЛЖЕН ПРОЙТИ
+npm test
+```
 
-3. **Рефактори если нужно**
-   - Убери дублирование
-   - Улучши читаемость
-   - Тесты всё ещё должны проходить
+#### 3. Refactor (если нужно)
+```bash
+# Улучши код без изменения поведения
+# Тесты ВСЁ ЕЩЁ должны проходить
+npm test
+```
 
-4. **Закоммить с описательным сообщением**
-   ```bash
-   git add .
-   git commit -m "type(scope): description"
-   ```
+#### 4. Commit
+```bash
+git add .
+git commit -m "type(scope): description
 
-5. **Обнови tracking файлы**
-   - Отметь выполненный шаг в current-task.md
-   - Добавь запись в progress.md
+Step X/Y of [task-id]"
+```
+
+#### 5. Update Tracking
+- Отметь `[x]` выполненный шаг в `current-task.md`
+- Добавь запись в `progress.md`
 
 ## After All Steps Completed
 
 ```bash
-# Запусти ВСЕ тесты
-npm run test  # или pytest
+# 1. Все тесты
+npm test
 
-# Запусти linter
-npm run lint  # или ruff check .
+# 2. Linting
+npm run lint
 
-# Проверь типы
-npm run typecheck  # или mypy .
+# 3. Type checking (если TypeScript)
+npm run typecheck
+
+# 4. Build (если есть)
+npm run build 2>&1 | tail -20
 ```
 
-Если фича полностью готова:
-- Обнови статус в `features.json` на "done"
-- Добавь completedAt дату
+## Completion Checklist
+
+- [ ] Все шаги плана выполнены
+- [ ] Все тесты проходят
+- [ ] Linting без ошибок
+- [ ] Нет `console.log` в production коде
+- [ ] `progress.md` обновлён
+- [ ] `current-task.md` все шаги отмечены
+- [ ] Код закоммичен
 
 ## Rules
-- Работай над ОДНИМ шагом за раз
-- НЕ пропускай тесты
-- Коммить ЧАСТО (после каждого логического изменения)
-- Если что-то сломалось - почини СРАЗУ
-- НИКОГДА не оставляй код в нерабочем состоянии
+
+- Работай над **ОДНИМ** шагом за раз
+- **НЕ** пропускай написание тестов
+- Коммить **ЧАСТО** (после каждого логического изменения)
+- Если что-то сломалось — почини **СРАЗУ**
+- **НИКОГДА** не оставляй код в нерабочем состоянии
+- Если застрял > 15 минут — запиши в progress.md и спроси помощи
 
 ## Output
+
 После завершения покажи:
-- Список созданных/изменённых файлов
-- Результаты тестов
-- Git log последних коммитов
+```markdown
+## Implementation Complete
+
+### Files Changed
+- `file1.ts` — [description]
+- `file2.ts` — [description]
+
+### Tests Added
+- `test_file.ts` — [what it tests]
+
+### Git Log
+[последние N коммитов]
+
+### Next Steps
+- [ ] Run /project:review for code review
+- [ ] Or continue with next task
+```

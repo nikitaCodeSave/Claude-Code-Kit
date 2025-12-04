@@ -1,23 +1,8 @@
 {
-  "project": "PROJECT_NAME",
-  "description": "Project description",
-  "lastUpdated": "2025-01-01T00:00:00Z",
-  "features": [
-    {
-      "id": "F001",
-      "name": "Example Feature",
-      "description": "Description of what this feature does",
-      "priority": 1,
-      "status": "pending",
-      "steps": [
-        {"name": "Step 1 description", "done": false},
-        {"name": "Step 2 description", "done": false},
-        {"name": "Write tests", "done": false}
-      ],
-      "createdAt": "2025-01-01",
-      "completedAt": null
-    }
-  ],
+  "project": "Claude-Code-Kit",
+  "description": "Template/toolkit for Claude Code workflows with agents, commands, and workspace structure",
+  "lastUpdated": "2025-12-04T23:30:00Z",
+  "features": [],
   "statusLegend": {
     "pending": "Not started",
     "planned": "Plan created, not implemented",
