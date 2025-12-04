@@ -1,0 +1,35 @@
+{
+  "project": "PROJECT_NAME",
+  "description": "Project description",
+  "lastUpdated": "2025-01-01T00:00:00Z",
+  "features": [
+    {
+      "id": "F001",
+      "name": "Example Feature",
+      "description": "Description of what this feature does",
+      "priority": 1,
+      "status": "pending",
+      "steps": [
+        {"name": "Step 1 description", "done": false},
+        {"name": "Step 2 description", "done": false},
+        {"name": "Write tests", "done": false}
+      ],
+      "createdAt": "2025-01-01",
+      "completedAt": null
+    }
+  ],
+  "statusLegend": {
+    "pending": "Not started",
+    "planned": "Plan created, not implemented",
+    "in_progress": "Currently being worked on",
+    "review": "Implementation done, needs review",
+    "testing": "In testing phase",
+    "done": "Completed and verified"
+  },
+  "priorityLegend": {
+    "1": "Critical - must have",
+    "2": "High - should have",
+    "3": "Medium - nice to have",
+    "4": "Low - future consideration"
+  }
+}
