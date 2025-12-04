@@ -1,0 +1,948 @@
+# Глубокий анализ системы агентов и команд Claude Code
+
+**Дата анализа:** Декабрь 2025  
+**Версия Claude Code:** 2.0.x+  
+**Источники:** Официальная документация Anthropic, лучшие практики сообщества, production-ready решения
+
+---
+
+## 📋 Оглавление
+
+1. [Общая оценка системы](#1-общая-оценка-системы)
+2. [Анализ агентов](#2-анализ-агентов)
+3. [Анализ команд](#3-анализ-команд)
+4. [Критические проблемы](#4-критические-проблемы)
+5. [Рекомендации по улучшению](#5-рекомендации-по-улучшению)
+6. [Предложения новых компонентов](#6-предложения-новых-компонентов)
+7. [Итоговые файлы](#7-итоговые-файлы)
+
+---
+
+## 1. Общая оценка системы
+
+### 1.1 Сильные стороны ✅
+
+| Аспект | Оценка | Комментарий |
+|--------|--------|-------------|
+| Разделение ответственности | 8/10 | Чёткое разделение: Lead → Code → Test → Review |
+| TDD-ориентированность | 9/10 | Правильный акцент на "тесты перед кодом" |
+| Workspace tracking | 7/10 | Продуманная система `.claude-workspace/` |
+| Документация команд | 7/10 | Детальные инструкции с шагами |
+| Безопасность | 6/10 | Есть ограничения, но недостаточно специфичные |
+
+### 1.2 Области для улучшения ⚠️
+
+| Аспект | Текущий статус | Рекомендация |
+|--------|----------------|--------------|
+| **Hooks** | Отсутствуют | КРИТИЧНО: Добавить для автоформатирования и валидации |
+| **Model selection** | Все `opus` | Неоптимально по стоимости — использовать `sonnet` для code-agent, test-agent |
+| **Tool scoping** | Минимальное | Добавить granular permissions согласно документации |
+| **Description triggers** | Слабые | Усилить фразами "PROACTIVELY", "MUST BE USED" |
+| **Context discovery** | Отсутствует | Добавить секции для автоопределения контекста |
+| **Inter-agent communication** | Отсутствует | Добавить протоколы делегирования |
+
+### 1.3 Соответствие Best Practices Anthropic
+
+```
+Официальные рекомендации 2025:
+┌─────────────────────────────────────────────────────────────┐
+│ ✅ "Give each subagent one clear goal"                      │
+│ ✅ "Keep descriptions action-oriented"                      │
+│ ⚠️ "Scope tools per agent" — частично реализовано          │
+│ ❌ "Use hooks for deterministic actions" — отсутствует     │
+│ ⚠️ "PROACTIVELY triggers" — недостаточно явные             │
+│ ❌ "Context isolation with summaries" — не реализовано     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 2. Анализ агентов
+
+### 2.1 Lead Agent (`lead-agent.md`)
+
+#### Текущее состояние
+```yaml
+name: lead-agent
+description: Планирование и декомпозиция задач...
+tools: Read, Grep, Glob, Bash
+model: opus
+```
+
+#### Проблемы
+1. **Model overkill**: `opus` дорогой для планирования — `sonnet` достаточен
+2. **Description слабое**: Нет явных триггеров автовызова
+3. **Bash без ограничений**: Риск неконтролируемых команд
+4. **Нет секции Context Discovery**: Агент не знает как обнаружить контекст проекта
+
+#### Рекомендуемые изменения
+```yaml
+# БЫЛО:
+description: Планирование и декомпозиция задач. Используй для архитектурных решений...
+
+# СТАЛО:
+description: Senior architect for planning and task decomposition. MUST BE USED PROACTIVELY before implementing any feature larger than 50 lines. Use when user says "plan", "think hard", "ultrathink", or asks about architecture.
+tools: Read, Grep, Glob, Bash(git:log,git:status,git:diff)
+model: sonnet  # opus только для сложнейших задач
+```
+
+#### Добавить секцию Context Discovery
+```markdown
+## Context Discovery
+При вызове СНАЧАЛА:
+1. Проверьте `CLAUDE.md` для понимания проекта
+2. Запустите `git status && git log --oneline -10`
+3. Прочитайте `.claude-workspace/progress.md` для текущего состояния
+4. Используйте `rg "TODO|FIXME|HACK" --type-add 'code:*.{ts,py,js}' -t code` для tech debt
+```
+
+---
+
+### 2.2 Code Agent (`code-agent.md`)
+
+#### Текущее состояние
+```yaml
+name: code-agent
+tools: Read, Edit, Write, Bash, Grep, Glob
+model: opus
+```
+
+#### Проблемы
+1. **Opus избыточен**: Для имплементации `sonnet` оптимален (быстрее + дешевле)
+2. **Bash без scoping**: Нет ограничений на опасные команды
+3. **Нет MultiEdit**: Современный инструмент для batch-редактирования
+4. **Write вместо Edit**: Edit предпочтительнее для существующих файлов
+
+#### Рекомендуемые изменения
+```yaml
+name: code-agent
+description: Implementation specialist. Use PROACTIVELY after plan approval. Follows TDD strictly - writes tests BEFORE code.
+tools: Read, Edit, MultiEdit, Write, Bash(npm:*,yarn:*,pnpm:*,pytest,python,node,git:add,git:commit), Grep, Glob
+model: sonnet  # Быстрее и дешевле для имплементации
+```
+
+#### Добавить секцию
+```markdown
+## Tool Usage Priority
+1. **Edit** > Write для существующих файлов
+2. **MultiEdit** для множественных изменений в одном файле
+3. **Bash** только для:
+   - Запуска тестов
+   - Запуска linter/formatter
+   - Git операции (add, commit)
+   - Package manager команды
+
+## ЗАПРЕЩЕНО
+- `rm -rf`, `sudo`, прямой доступ к `.env`
+- `git push` без явного разрешения пользователя
+- Модификация файлов вне проекта
+```
+
+---
+
+### 2.3 Test Agent (`test-agent.md`)
+
+#### Текущее состояние
+```yaml
+name: test-agent
+tools: Read, Write, Edit, Bash, Grep, Glob
+model: opus
+```
+
+#### Проблемы
+1. **Opus избыточен**: Тестирование — `sonnet` или даже `haiku`
+2. **Нет WebFetch**: Для документации тестовых фреймворков
+3. **Нет интеграции с Puppeteer MCP**: Упоминается, но не подключён
+
+#### Рекомендуемые изменения
+```yaml
+name: test-agent
+description: QA specialist. MUST BE USED PROACTIVELY after ANY code changes. Writes tests FIRST in TDD workflow.
+tools: Read, Write, Edit, Bash(npm:test,yarn:test,pytest,jest,vitest,playwright), Grep, Glob
+model: sonnet
+```
+
+#### Добавить интеграцию с browser testing
+```markdown
+## E2E Testing Setup
+При наличии Puppeteer/Playwright MCP:
+1. Запусти dev server: `npm run dev`
+2. Открой браузер через MCP
+3. Выполни user flow
+4. Сделай скриншоты критических точек
+5. Сравни с ожидаемым поведением
+
+Без browser automation:
+- Используй `curl` для API тестов
+- Проверяй HTTP статусы и response bodies
+```
+
+---
+
+### 2.4 Review Agent (`review-agent.md`)
+
+#### Текущее состояние
+```yaml
+name: review-agent
+tools: Read, Grep, Glob, Bash
+model: opus
+```
+
+#### Проблемы
+1. **Read-only, но есть Bash**: Противоречие — может выполнять изменяющие команды
+2. **Нет явных критериев блокировки**: Когда НЕЛЬЗЯ approve?
+
+#### Рекомендуемые изменения
+```yaml
+name: review-agent
+description: Independent code reviewer. MUST BE USED after implementation, before merge. Provides objective quality assessment.
+tools: Read, Grep, Glob, Bash(git:diff,git:log,git:show,npm:run:lint,npm:run:test)
+model: sonnet  # inherit если нужна consistency с main
+```
+
+#### Добавить критерии блокировки
+```markdown
+## Automatic REJECT Criteria
+НЕМЕДЛЕННО отклонить если найдено:
+- [ ] Hardcoded secrets/credentials
+- [ ] console.log/print statements в production коде
+- [ ] Закомментированный код > 10 строк
+- [ ] Отсутствие тестов для новой функциональности
+- [ ] Покрытие тестами упало
+- [ ] Security vulnerabilities (SQL injection, XSS, etc.)
+- [ ] Breaking changes без документации
+```
+
+---
+
+## 3. Анализ команд
+
+### 3.1 Общие проблемы команд
+
+| Команда | Проблема | Решение |
+|---------|----------|---------|
+| `/plan` | Нет `description` в frontmatter | Добавить для SlashCommand tool |
+| `/implement` | Нет интеграции с hooks | Добавить auto-format после каждого шага |
+| `/review` | Hardcoded количество коммитов | Сделать умный default |
+| `/test` | Нет поддержки coverage | Добавить coverage отчёты |
+| `/status` | Слишком verbose | Добавить compact mode |
+| `/fix-issue` | Нет валидации номера issue | Добавить проверку существования |
+
+### 3.2 Отсутствует YAML Frontmatter
+
+**Критично**: Начиная с Claude Code 1.0.124, SlashCommand tool использует `description` из frontmatter для автоматического вызова команд. Без него команды НЕ БУДУТ автоматически предлагаться Claude.
+
+#### Рекомендуемый формат для ВСЕХ команд:
+```yaml
+---
+description: Brief description for Claude to know when to suggest this command
+allowed-tools: Read, Grep, Bash  # Optional: limit tools
+---
+```
+
+### 3.3 Детальный анализ команд
+
+#### `/project:plan`
+```markdown
+# ТЕКУЩЕЕ
+# Plan Feature/Task: $ARGUMENTS
+Создай детальный план для задачи. НЕ ПИШИ КОД.
+
+# РЕКОМЕНДУЕМОЕ
+---
+description: Creates detailed implementation plan. Use when user mentions "plan", "design", "architect", or before any feature > 50 LOC.
+allowed-tools: Read, Grep, Glob, Bash
+---
+# Plan Feature: $ARGUMENTS
+...
+```
+
+#### `/project:implement`
+```markdown
+# ДОБАВИТЬ FRONTMATTER
+---
+description: Implements current task from .claude-workspace/current-task.md using TDD. Use after plan is approved.
+---
+```
+
+#### `/project:status`
+```markdown
+# ДОБАВИТЬ COMPACT MODE
+---
+description: Shows project status. Use for quick overview or when user asks "what's next", "where are we".
+---
+
+## Режим вывода
+Если $ARGUMENTS содержит "compact" или "short":
+- Покажи только: текущую задачу, последний коммит, следующий шаг
+- БЕЗ детальных списков и таблиц
+```
+
+---
+
+## 4. Критические проблемы
+
+### 🚨 КРИТИЧНО #1: Отсутствие Hooks
+
+**Проблема**: Без hooks нет гарантии выполнения критических действий (форматирование, линтинг, валидация).
+
+**Влияние**: Claude может "забыть" запустить prettier или eslint после редактирования файла.
+
+**Решение**: Создать `.claude/settings.json` с hooks:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $CLAUDE_FILE_PATHS 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command", 
+            "command": "echo $CLAUDE_TOOL_INPUT | grep -qE '(rm -rf|sudo|> /dev)' && echo 'BLOCKED: Dangerous command' && exit 2 || exit 0"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '✅ Session completed' && date >> ~/.claude/session-log.txt"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 🚨 КРИТИЧНО #2: Все агенты на Opus
+
+**Проблема**: Использование `opus` для всех агентов — неоптимально по стоимости и скорости.
+
+**Рекомендация по моделям (по документации Anthropic 2025)**:
+
+| Агент | Текущая | Рекомендуемая | Обоснование |
+|-------|---------|---------------|-------------|
+| lead-agent | opus | **sonnet** | Планирование не требует максимального интеллекта |
+| code-agent | opus | **sonnet** | Sonnet 4.5 оптимален для coding tasks |
+| test-agent | opus | **sonnet** | Тестирование — стандартная задача |
+| review-agent | opus | **sonnet** или **inherit** | Для consistency с main conversation |
+
+**Когда использовать Opus**:
+- Сложное архитектурное планирование
+- Security audits
+- Критические бизнес-решения
+- Задачи требующие максимального reasoning
+
+---
+
+### 🚨 КРИТИЧНО #3: Слабые триггеры в descriptions
+
+**Проблема**: Descriptions не содержат явных trigger phrases для proactive invocation.
+
+**Текущее**:
+```yaml
+description: Планирование и декомпозиция задач. Используй для архитектурных решений...
+```
+
+**Рекомендуемое** (по документации Anthropic):
+```yaml
+description: Senior architect for planning. MUST BE USED PROACTIVELY before implementing features > 50 LOC. Triggers: "plan", "think hard", "ultrathink", "design", "architect".
+```
+
+**Ключевые фразы** (из официальной документации):
+- `"Use PROACTIVELY"` — агент будет вызываться автоматически
+- `"MUST BE USED"` — обязательный вызов в определённых условиях
+- `"Use immediately after..."` — связь с предыдущими действиями
+- `"Triggers: ..."` — явное указание ключевых слов
+
+---
+
+### 🚨 КРИТИЧНО #4: Отсутствие Context Discovery
+
+**Проблема**: Агенты не знают как обнаружить контекст проекта при старте.
+
+**Решение**: Добавить в каждого агента:
+
+```markdown
+## Context Discovery
+При вызове СНАЧАЛА выполни:
+1. `cat CLAUDE.md 2>/dev/null` — правила проекта
+2. `cat .claude-workspace/current-task.md 2>/dev/null` — текущая задача
+3. `cat .claude-workspace/progress.md | head -30` — последний прогресс
+4. `git status && git log --oneline -5` — состояние репозитория
+5. Определи tech stack: `cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null`
+```
+
+---
+
+## 5. Рекомендации по улучшению
+
+### 5.1 Структурные изменения
+
+```
+.claude/
+├── agents/
+│   ├── lead-agent.md      # Обновить triggers + model
+│   ├── code-agent.md      # Добавить MultiEdit + scoped Bash
+│   ├── test-agent.md      # Добавить coverage tracking
+│   ├── review-agent.md    # Добавить auto-reject criteria
+│   └── explore-agent.md   # НОВЫЙ: Quick codebase exploration
+├── commands/
+│   ├── init-project.md    # Добавить frontmatter
+│   ├── plan.md            # Добавить frontmatter
+│   ├── implement.md       # Добавить frontmatter
+│   ├── test.md            # Добавить frontmatter + coverage
+│   ├── review.md          # Добавить smart defaults + frontmatter
+│   ├── status.md          # Добавить compact mode + frontmatter
+│   ├── fix-issue.md       # Добавить validation + frontmatter
+│   └── quick-fix.md       # НОВЫЙ: Fast bug fixes
+├── settings.json          # НОВЫЙ: Hooks configuration
+└── hooks/                 # НОВЫЙ: Hook scripts
+    └── validate-bash.sh
+```
+
+### 5.2 Обновлённые агенты
+
+#### 5.2.1 Lead Agent (обновлённый)
+```markdown
+---
+name: lead-agent
+description: Senior software architect. MUST BE USED PROACTIVELY before implementing any feature > 50 LOC or when user mentions "plan", "think hard", "ultrathink", "design", "architect". Creates detailed implementation plans.
+tools: Read, Grep, Glob, Bash(git:*)
+model: sonnet
+---
+
+Вы — старший софтверный архитектор, отвечающий за планирование и координацию.
+
+## Context Discovery
+При вызове СНАЧАЛА:
+1. Прочитайте `CLAUDE.md` для понимания правил проекта
+2. Проверьте `git status && git log --oneline -10`
+3. Прочитайте `.claude-workspace/progress.md | head -30`
+4. Определите tech stack через package.json/pyproject.toml
+
+## Responsibilities
+1. Анализ requirements и user stories
+2. Декомпозиция на атомарные подзадачи (каждая ≤ 30 минут)
+3. Определение приоритетов и зависимостей
+4. Создание детальных планов имплементации
+5. Оценка рисков и mitigation strategies
+
+## Planning Process (OODA Loop)
+### Observe
+- Изучи требования пользователя
+- Проверь существующий код и паттерны
+- Найди аналогичные реализации в codebase
+
+### Orient
+- Какие компоненты затронуты?
+- Какие зависимости существуют?
+- Какие риски присутствуют?
+
+### Decide
+- Разбей на атомарные шаги (1 шаг = 1 коммит)
+- Определи порядок имплементации
+- Укажи конкретные файлы и команды
+
+### Act
+- Сохрани план в `.claude-workspace/current-task.md`
+- Обнови `features.json` если новая фича
+- Добавь запись в `progress.md`
+
+## Output Format
+```markdown
+## Task: [Name]
+
+### Objective
+[1-2 предложения, чёткая цель]
+
+### Complexity: S/M/L/XL
+### Estimated Steps: N
+### Risk Level: Low/Medium/High
+
+### Implementation Steps
+1. [ ] Step 1
+   - Files: `path/to/file`
+   - Tests: what to test
+   - Command: `specific command`
+
+### Dependencies
+- [list]
+
+### Risks & Mitigations
+| Risk | Mitigation |
+|------|------------|
+
+### Success Criteria
+- [ ] Criterion 1
+```
+
+## Constraints
+- НИКОГДА не пиши код имплементации
+- НЕ модифицируй файлы
+- ВСЕГДА спрашивай если requirements неясны
+- Каждый шаг должен быть завершаем за < 30 минут
+```
+
+#### 5.2.2 Code Agent (обновлённый)
+```markdown
+---
+name: code-agent
+description: Implementation specialist. Use PROACTIVELY after plan approval to implement features. Follows strict TDD - writes tests BEFORE code. Works incrementally, keeping code in working state.
+tools: Read, Edit, MultiEdit, Write, Grep, Glob, Bash(npm:*,yarn:*,pnpm:*,pytest,python,node,git:add,git:commit,git:status)
+model: sonnet
+---
+
+Вы — Code Agent, отвечающий за реализацию кода строго по плану.
+Работаете инкрементально, оставляя код в чистом состоянии после каждого шага.
+
+## Context Discovery
+При вызове:
+1. `cat .claude-workspace/current-task.md` — текущий план
+2. `cat .claude-workspace/progress.md | head -30` — что сделано
+3. `git status && git diff --stat` — текущие изменения
+4. Определи test command из package.json/pyproject.toml
+
+## Tool Usage Priority
+1. **Edit** > Write для существующих файлов (ВСЕГДА читай файл перед Edit)
+2. **MultiEdit** для множественных изменений в одном файле
+3. **Write** только для новых файлов
+4. **Bash** только для: тестов, linting, git (add, commit, status)
+
+## TDD Process
+```
+┌─────────────────────────────────────┐
+│  1. Write Test (RED)                │
+│     - Тест expected behavior        │
+│     - Запусти тест - ДОЛЖЕН УПАСТЬ  │
+├─────────────────────────────────────┤
+│  2. Write Code (GREEN)              │
+│     - Минимальный код для теста     │
+│     - Запусти тест - ДОЛЖЕН ПРОЙТИ  │
+├─────────────────────────────────────┤
+│  3. Refactor                        │
+│     - Улучши если нужно             │
+│     - Тесты ВСЁ ЕЩЁ проходят        │
+├─────────────────────────────────────┤
+│  4. Commit                          │
+│     - Descriptive message           │
+│     - Reference step number         │
+└─────────────────────────────────────┘
+```
+
+## Commit Format
+```
+type(scope): description
+
+Types: feat, fix, refactor, test, docs, chore
+Example: feat(auth): add JWT validation
+```
+
+## Clean State Checklist
+Перед завершением:
+- [ ] Все тесты проходят
+- [ ] Нет linting errors
+- [ ] Нет console.log/print statements
+- [ ] progress.md обновлён
+- [ ] current-task.md шаги отмечены
+
+## ЗАПРЕЩЕНО
+- `rm -rf`, `sudo`, любые деструктивные команды
+- Прямой доступ к `.env`, secrets, credentials
+- `git push` без явного разрешения
+- Модификация тестов чтобы они "прошли"
+- Оставлять код в сломанном состоянии
+
+## Error Recovery
+Если что-то сломалось:
+1. `git status` — что изменено
+2. `git diff` — что именно
+3. `git stash` или `git checkout -- .` — откатить
+4. Задокументировать в progress.md
+5. Начать шаг заново
+```
+
+### 5.3 Новые команды
+
+#### `/project:quick-fix` (НОВАЯ)
+```markdown
+---
+description: Quick bug fix without full planning cycle. Use for small fixes < 20 LOC.
+allowed-tools: Read, Edit, Bash, Grep
+---
+# Quick Fix: $ARGUMENTS
+
+Быстрое исправление небольшого бага без полного цикла планирования.
+
+## Constraints
+- Только для изменений < 20 строк
+- Только для очевидных багов
+- НЕ для новых фич или рефакторинга
+
+## Process
+1. Найди проблемный код: `rg "$ARGUMENTS"`
+2. Прочитай файл и контекст
+3. Напиши тест воспроизводящий баг
+4. Исправь минимально
+5. Проверь что тест проходит
+6. Проверь что другие тесты не сломались
+7. Коммит: `fix(scope): $ARGUMENTS`
+
+## Output
+- Изменённые файлы
+- Добавленные тесты
+- Git commit hash
+```
+
+### 5.4 Hooks Configuration
+
+#### `.claude/settings.json`
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-bash.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Session ended: $(date)\" >> .claude-workspace/session-log.txt"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Subagent completed\" && cat .claude-workspace/current-task.md | head -5"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### `.claude/hooks/validate-bash.sh`
+```bash
+#!/bin/bash
+# Валидация Bash команд перед выполнением
+
+DANGEROUS_PATTERNS=(
+  "rm -rf /"
+  "rm -rf ~"
+  "rm -rf \*"
+  "sudo rm"
+  "> /dev/sd"
+  "mkfs"
+  "dd if="
+  ":(){:|:&};:"
+)
+
+INPUT=$(cat)
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+
+for pattern in "${DANGEROUS_PATTERNS[@]}"; do
+  if echo "$COMMAND" | grep -qF "$pattern"; then
+    echo "BLOCKED: Dangerous command pattern detected: $pattern" >&2
+    exit 2  # Exit code 2 blocks the tool
+  fi
+done
+
+# Check for .env access
+if echo "$COMMAND" | grep -qE '(cat|less|more|head|tail|vim|nano|code).*\.env'; then
+  echo "BLOCKED: Direct .env file access not allowed" >&2
+  exit 2
+fi
+
+exit 0
+```
+
+---
+
+## 6. Предложения новых компонентов
+
+### 6.1 Explore Agent (Быстрая разведка кодовой базы)
+
+```markdown
+---
+name: explore-agent
+description: Quick codebase exploration specialist. Use PROACTIVELY when user asks "where is...", "find...", "how does X work", or when understanding codebase structure is needed.
+tools: Read, Grep, Glob, Bash(find,tree,wc,head,tail)
+model: haiku
+---
+
+Вы — эксперт по быстрой разведке кодовой базы.
+Ваша задача — быстро найти нужную информацию и вернуть КРАТКИЙ ответ.
+
+## Context Discovery
+1. `ls -la` — структура корня
+2. `find . -name "*.md" -type f | head -20` — документация
+3. `cat package.json 2>/dev/null | jq '.scripts'` — доступные команды
+
+## Search Strategies
+### Найти файл по имени
+```bash
+find . -name "*$QUERY*" -type f | grep -v node_modules | head -20
+```
+
+### Найти код по паттерну
+```bash
+rg "$PATTERN" --type-add 'code:*.{ts,js,py,go,rs}' -t code -l | head -20
+```
+
+### Понять структуру
+```bash
+tree -L 2 -I 'node_modules|__pycache__|.git' | head -50
+```
+
+## Output Format
+ВСЕГДА возвращай краткий ответ:
+- Что найдено (файлы/функции/классы)
+- Где находится (путь)
+- Краткое описание (1-2 предложения)
+
+## Constraints
+- НИКОГДА не модифицируй файлы
+- Ограничивай вывод (head, tail, -l flags)
+- Возвращай только релевантную информацию
+- Максимум 20 результатов
+```
+
+### 6.2 Security Agent (Аудит безопасности)
+
+```markdown
+---
+name: security-agent
+description: Security audit specialist. MUST BE USED before production deployments and after implementing authentication, authorization, or data handling code.
+tools: Read, Grep, Glob
+model: opus
+---
+
+Вы — специалист по безопасности приложений.
+Ваша задача — найти уязвимости и compliance проблемы.
+
+## Audit Scope
+1. **Secrets Detection**
+   ```bash
+   rg -i "(api[_-]?key|password|secret|token|credential)" --type-add 'config:*.{yml,yaml,json,env,toml}' -t config
+   rg "-----BEGIN (RSA |EC |DSA )?PRIVATE KEY-----"
+   ```
+
+2. **Injection Vulnerabilities**
+   ```bash
+   rg "(execute|query|raw).*\+" --type py --type js  # SQL injection
+   rg "(exec|system|eval|spawn)\s*\(" --type js --type py  # Command injection
+   rg "innerHTML|dangerouslySetInnerHTML" --type js --type ts  # XSS
+   ```
+
+3. **Authentication/Authorization**
+   - Отсутствующие auth checks
+   - Hardcoded credentials
+   - Weak session management
+
+4. **Input Validation**
+   - Missing sanitization
+   - File upload без валидации
+   - Rate limiting отсутствует
+
+## Finding Severity
+| Level | Description | Action |
+|-------|-------------|--------|
+| CRITICAL | Data breach risk | BLOCK deployment |
+| HIGH | Security vulnerability | Fix before merge |
+| MEDIUM | Best practice violation | Fix recommended |
+| LOW | Minor improvement | Optional |
+
+## Output Format
+```markdown
+## Security Audit Report
+
+**Date:** [timestamp]
+**Scope:** [files/directories audited]
+
+### Critical Findings
+1. **[Title]**
+   - File: `path:line`
+   - Issue: [description]
+   - Remediation: [how to fix]
+   - CWE: [reference]
+
+### Summary
+- Critical: N
+- High: N
+- Medium: N
+- Low: N
+
+### Recommendations
+1. [Priority action]
+```
+
+## Constraints
+- НИКОГДА не выполняй exploits
+- НЕ модифицируй файлы
+- НЕ логируй найденные secrets
+```
+
+### 6.3 Doc Agent (Документация)
+
+```markdown
+---
+name: doc-agent
+description: Documentation specialist. Use when user asks to document code, create README, or update docs. Use PROACTIVELY after major feature completion.
+tools: Read, Write, Edit, Grep, Glob, WebFetch
+model: sonnet
+---
+
+Вы — специалист по технической документации.
+
+## Documentation Types
+1. **README.md** — проектная документация
+2. **API Docs** — endpoint документация
+3. **Code Comments** — inline documentation
+4. **Architecture Docs** — system design
+
+## Process
+1. Прочитай существующую документацию
+2. Изучи код который нужно документировать
+3. Определи аудиторию (developers, users, ops)
+4. Напиши документацию в соответствующем стиле
+
+## Style Guidelines
+- Начинай с "What" и "Why", потом "How"
+- Включай примеры использования
+- Документируй edge cases и ограничения
+- Используй consistent formatting
+
+## Output
+- Обновлённые/созданные .md файлы
+- Inline comments в коде
+- Changelog записи если нужно
+```
+
+---
+
+## 7. Итоговые файлы
+
+### 7.1 Минимальный пак для старта
+
+Для универсальной работы с любым проектом рекомендую следующий минимальный набор:
+
+```
+.claude/
+├── agents/
+│   ├── lead-agent.md      # Планирование (sonnet)
+│   ├── code-agent.md      # Имплементация (sonnet)
+│   ├── test-agent.md      # Тестирование (sonnet)
+│   ├── review-agent.md    # Ревью (sonnet/inherit)
+│   └── explore-agent.md   # Быстрая разведка (haiku)
+├── commands/
+│   ├── init-project.md    # Инициализация workspace
+│   ├── plan.md            # Планирование фичи
+│   ├── implement.md       # Реализация по плану
+│   ├── test.md            # E2E тестирование
+│   ├── review.md          # Code review
+│   ├── status.md          # Статус проекта
+│   ├── fix-issue.md       # Исправление GitHub issue
+│   └── quick-fix.md       # Быстрые исправления
+├── settings.json          # Hooks configuration
+└── hooks/
+    └── validate-bash.sh   # Security validation
+
+.claude-workspace/
+├── progress.md            # Лог прогресса
+├── current-task.md        # Текущая задача
+├── features.json          # Трекинг фич
+└── decisions.md           # Архитектурные решения
+```
+
+### 7.2 Расширенный пак для production
+
+Для серьёзных проектов добавить:
+
+```
+.claude/agents/
+├── security-agent.md      # Security audits (opus)
+├── doc-agent.md           # Documentation (sonnet)
+└── perf-agent.md          # Performance analysis (sonnet)
+
+.claude/commands/
+├── security-audit.md      # Запуск security audit
+├── generate-docs.md       # Генерация документации
+└── analyze-perf.md        # Анализ производительности
+```
+
+---
+
+## Заключение
+
+### Приоритеты реализации
+
+1. **КРИТИЧНО (сделать сразу)**:
+   - Добавить hooks для auto-formatting и validation
+   - Обновить models (opus → sonnet где возможно)
+   - Добавить trigger phrases в descriptions
+   - Добавить frontmatter к командам
+
+2. **ВАЖНО (следующая итерация)**:
+   - Добавить Context Discovery секции
+   - Добавить explore-agent для быстрой разведки
+   - Улучшить tool scoping для безопасности
+
+3. **ЖЕЛАТЕЛЬНО (когда будет время)**:
+   - Добавить security-agent для аудитов
+   - Добавить doc-agent для документации
+   - Интегрировать с Puppeteer MCP для E2E
+
+### Ключевые метрики успеха
+
+После внедрения изменений ожидается:
+- ⬇️ 30-50% снижение затрат на API (за счёт sonnet вместо opus)
+- ⬆️ 20-40% ускорение workflow (за счёт hooks и auto-formatting)
+- ⬆️ Повышение качества кода (за счёт security validation)
+- ⬆️ Улучшение proactive behavior агентов
+
+---
+
+*Отчёт подготовлен на основе официальной документации Anthropic (2025), лучших практик сообщества Claude Code, и анализа production-ready решений.*
