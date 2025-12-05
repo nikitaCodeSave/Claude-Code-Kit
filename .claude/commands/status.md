@@ -4,33 +4,54 @@ allowed-tools: Read, Bash, Grep, Glob
 ---
 # Project Status
 
+> `$ARGUMENTS`:
+> - `compact` или `short` — краткий вывод
+> - пусто — полный статус
+
 Покажи текущий статус проекта.
 
-## Arguments
+## Context Discovery
 
-`$ARGUMENTS`:
-- `compact` или `short` — краткий вывод (только essentials)
-- пусто — полный статус
+При вызове СНАЧАЛА (с timeout для безопасности):
+
+```bash
+# 1. Текущая задача
+cat .claude-workspace/current-task.md 2>/dev/null | head -15 || echo "No active task"
+
+# 2. Git status (быстро)
+timeout 5 git status --short 2>/dev/null | head -10
+
+# 3. Тесты (quick check - только список)
+timeout 10 pytest --co -q 2>/dev/null | tail -5 || echo "Tests: unknown"
+```
+
+## Missing Files Handling
+
+| Файл | Если отсутствует |
+|------|------------------|
+| features.json | Показать "No features tracked" |
+| current-task.md | Показать "No active task" |
+| progress.md | Показать "No history" |
 
 ## Gather Information
 
 ```bash
 # 1. Текущая задача
-TASK=$(cat .claude-workspace/current-task.md 2>/dev/null | head -20)
+TASK=$(cat .claude-workspace/current-task.md 2>/dev/null | head -20) || TASK="No active task"
 
 # 2. Последний прогресс
-PROGRESS=$(cat .claude-workspace/progress.md 2>/dev/null | tail -30)
+PROGRESS=$(cat .claude-workspace/progress.md 2>/dev/null | tail -30) || PROGRESS="No history"
 
 # 3. Git status
 GIT_STATUS=$(git status --short 2>/dev/null)
 GIT_LOG=$(git log --oneline -5 2>/dev/null)
 GIT_BRANCH=$(git branch --show-current 2>/dev/null)
 
-# 4. Тесты (quick check)
-TEST_RESULT=$(timeout 30 npm test 2>&1 | tail -5 || echo "Tests not configured")
+# 4. Тесты (quick check с timeout)
+TEST_RESULT=$(timeout 30 pytest --co -q 2>&1 | tail -5 || echo "Tests not configured")
 
 # 5. Features
-FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] | "\(.status): \(.name)"' 2>/dev/null)
+FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] | "\(.status): \(.name)"' 2>/dev/null) || FEATURES="No features tracked"
 ```
 
 ## Output Format
@@ -129,6 +150,18 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 | Есть изменения, готово | `/project:review` |
 | Есть failed tests | `/project:test [feature]` |
 | Есть uncommitted | `git add . && git commit` |
+
+## Constraints
+
+### ЗАПРЕЩЕНО
+- Модифицировать файлы (read-only команда!)
+- Запускать полные тесты (только --collect-only)
+- Долгие операции без timeout
+
+### ОБЯЗАТЕЛЬНО
+- Использовать timeout для всех команд
+- Graceful handling если файлы отсутствуют
+- Показать конкретный next step
 
 ## Output
 

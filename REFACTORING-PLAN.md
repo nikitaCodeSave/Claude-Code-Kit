@@ -1,7 +1,7 @@
 # План рефакторинга Claude Code Kit
 
 **Дата начала:** 2025-12-05
-**Текущая фаза:** Фаза 2 завершена
+**Текущая фаза:** Фаза 4 завершена
 
 ---
 
@@ -134,49 +134,63 @@
 
 ## Фаза 4: Команды (детальный разбор)
 
-> **Статус: ОЖИДАЕТ**
+> **Статус: ЗАВЕРШЕНА** (2025-12-05)
 
 ### Чек-лист
 
-- [ ] **4.1 init-project.md** (210 строк) — Оценка: 8/10
-  - [ ] Процесс создания файлов корректен
-  - [ ] Поддержка разных языков (Node, Python, Rust, Go)
-  - [ ] Git setup корректен
+- [x] **4.1 init-project.md** (211→~250 строк) — Оценка: 8→9/10
+  - [x] Context Discovery добавлен
+  - [x] Pre-existing Files Check добавлен
+  - [x] Idempotent bash скрипты
+  - [x] Error Handling добавлен
+  - [x] Constraints секция добавлена
 
-- [ ] **4.2 plan.md** (107 строк) — Оценка: 7/10 (после исправления)
+- [x] **4.2 plan.md** (107→~170 строк) — Оценка: 7→9/10
   - [x] Write добавлен в allowed-tools
-  - [ ] Процесс планирования логичен
-  - [ ] Интеграция с current-task.md работает
+  - [x] Context Discovery добавлен
+  - [x] Task Size Matrix добавлена
+  - [x] Realistic Search Examples (Python)
+  - [x] Approval Process добавлен
+  - [x] Constraints секция добавлена
 
-- [ ] **4.3 implement.md** (121 строка) — Оценка: 8/10
-  - [ ] TDD workflow корректен
-  - [ ] Pre-implementation checklist полный
-  - [ ] Commit стратегия адекватна
+- [x] **4.3 implement.md** (122→~185 строк) — Оценка: 8→9/10
+  - [x] Context Discovery добавлен
+  - [x] Python/pytest примеры TDD
+  - [x] Error Recovery секция добавлена
+  - [x] Timing Constraints добавлены
+  - [x] Constraints секция добавлена
+  - [x] Quality Checklist добавлен
 
-- [ ] **4.4 test.md** (201 строка) — Оценка: 8/10
-  - [ ] Матрица сценариев полная
-  - [ ] Поддержка разных фреймворков
-  - [ ] API testing примеры
+- [x] **4.4 test.md** (202→~290 строк) — Оценка: 8→9/10
+  - [x] Context Discovery добавлен
+  - [x] Python/pytest примеры
+  - [x] Test Timing Constraints таблица
+  - [x] Error Handling секция добавлена
+  - [x] Constraints секция добавлена
+  - [x] Quality Checklist добавлен
 
-- [ ] **4.5 review.md** (240 строк) — Оценка: 9/10 — **ОБРАЗЕЦ**
-  - [ ] Auto-REJECT критерии адекватны
-  - [ ] Severity levels понятны
-  - [ ] Before merge checklist полный
+- [x] **4.5 review.md** (241→~285 строк) — Оценка: 9→9.5/10 — **ОБРАЗЕЦ**
+  - [x] Context Discovery добавлен
+  - [x] Example Output добавлен
+  - [x] Quality Checklist добавлен
 
-- [ ] **4.6 quick-fix.md** (111 строк) — Оценка: 7/10
-  - [ ] Constraints ясны (<20 LOC)
-  - [ ] TDD процесс для мелких фиксов
-  - [ ] Эскалация к /plan если сложно
+- [x] **4.6 quick-fix.md** (112→~150 строк) — Оценка: 7→9/10
+  - [x] Context Discovery добавлен
+  - [x] Quick Fix Criteria таблица
+  - [x] Python/pytest примеры
+  - [x] Constraints секция расширена
 
-- [ ] **4.7 fix-issue.md** (275 строк) — Оценка: 8/10 (после исправления)
-  - [x] Структура файла исправлена
-  - [ ] GitHub CLI интеграция работает
-  - [ ] PR создание корректно
+- [x] **4.7 fix-issue.md** (275→~330 строк) — Оценка: 8→9/10
+  - [x] Context Discovery добавлен
+  - [x] Python/pytest примеры TDD
+  - [x] Extended Error Handling таблица
+  - [x] Keyword Extraction Examples
+  - [x] Constraints секция добавлена
 
-- [ ] **4.8 status.md** (139 строк) — Оценка: 8/10 (после исправления)
-  - [x] YAML frontmatter добавлен
-  - [x] Дубликаты удалены
-  - [ ] Compact/full режимы работают
+- [x] **4.8 status.md** (139→~170 строк) — Оценка: 8→9/10
+  - [x] Context Discovery с timeout
+  - [x] Missing Files Handling таблица
+  - [x] Constraints секция добавлена
 
 ---
 
@@ -251,7 +265,7 @@
 Фаза 1 [##########] 100% — ЗАВЕРШЕНА
 Фаза 2 [##########] 100% — ЗАВЕРШЕНА
 Фаза 3 [##########] 100% — ЗАВЕРШЕНА
-Фаза 4 [##        ]  25% — частично (fix, status, plan исправлены)
+Фаза 4 [##########] 100% — ЗАВЕРШЕНА
 Фаза 5 [##        ]  20% — частично (session-log удалён)
 Фаза 6 [          ]   0% — ожидает
 Фаза 7 [          ]   0% — ожидает
@@ -261,9 +275,9 @@
 
 ## Следующие шаги
 
-1. **Рекомендуется:** Закоммитить изменения Фаз 1, 2 и 3
-2. **Далее:** Фаза 4 (детальный разбор команд)
-3. **Приоритет:** implement.md, quick-fix.md требуют проверки
+1. **Рекомендуется:** Закоммитить изменения Фазы 4
+2. **Далее:** Фаза 5 (Workspace и Tracking)
+3. **Приоритет:** progress.md, features.json, current-task.md
 
 ---
 
@@ -325,4 +339,29 @@
 ├── git reset --hard: УДАЛЁН (деструктивная команда)
 ├── Основной язык примеров: Python
 └── doc-agent: 150-180 строк → фактически 320 строк
+```
+
+---
+
+## Файлы изменённые в Фазе 4
+
+```
+СУЩЕСТВЕННЫЕ ИЗМЕНЕНИЯ (8 команд):
+├── .claude/commands/quick-fix.md    (112→~150 строк) — Context Discovery, Criteria table, pytest
+├── .claude/commands/plan.md         (107→~170 строк) — Context Discovery, Task Size Matrix, Constraints
+├── .claude/commands/implement.md    (122→~185 строк) — Error Recovery, Timing, Quality Checklist
+├── .claude/commands/test.md         (202→~290 строк) — pytest examples, Error Handling, Constraints
+├── .claude/commands/init-project.md (211→~250 строк) — Idempotent scripts, Error Handling
+├── .claude/commands/fix-issue.md    (275→~330 строк) — Extended Error Handling, pytest
+├── .claude/commands/status.md       (139→~170 строк) — Timeouts, Missing Files Handling
+└── .claude/commands/review.md       (241→~285 строк) — Example Output, Quality Checklist
+
+ОБНОВЛЕНО:
+└── REFACTORING-PLAN.md (этот файл)
+
+ПРИНЯТЫЕ РЕШЕНИЯ:
+├── Язык примеров: Python-first (заменены все npm/jest на pytest)
+├── Quality Checklist: только в implement, test, review
+├── TDD template: НЕ создавать (оставить в каждой команде)
+└── $ARGUMENTS: документирован в каждой команде
 ```

@@ -4,27 +4,48 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 # Test Feature: $ARGUMENTS
 
+> `$ARGUMENTS` — название фичи для тестирования
+> Пример: `/test user login` → $ARGUMENTS = "user login"
+
 Протестируй фичу "$ARGUMENTS" end-to-end как реальный пользователь.
+
+## Context Discovery
+
+При вызове СНАЧАЛА:
+
+```bash
+# 1. Текущая задача
+cat .claude-workspace/current-task.md 2>/dev/null | head -15
+
+# 2. Существующие тесты
+ls tests/ 2>/dev/null || ls test/ 2>/dev/null
+
+# 3. Pytest конфигурация
+cat pytest.ini 2>/dev/null || cat pyproject.toml 2>/dev/null | grep -A 10 "\[tool.pytest"
+
+# 4. Найти тесты для фичи
+rg "$ARGUMENTS" tests/ 2>/dev/null | head -10
+```
 
 ## Pre-Test Setup
 
 ```bash
-# 1. Проверь что dev server можно запустить
-if [ -f "package.json" ]; then
+# 1. Проверь что dev server можно запустить (если FastAPI/Flask)
+if [ -f "pyproject.toml" ]; then
   echo "Starting dev server..."
-  npm run dev &
+  uvicorn main:app --reload &
   DEV_PID=$!
-  sleep 5
-  
+  sleep 3
+
   # Health check
-  curl -s http://localhost:3000/health || curl -s http://localhost:3000 | head -5
+  curl -s http://localhost:8000/health || curl -s http://localhost:8000/docs | head -5
 fi
 
 # 2. Определи test framework
-cat package.json 2>/dev/null | jq '.scripts.test, .devDependencies | keys | map(select(contains("jest") or contains("vitest") or contains("playwright")))'
+cat pyproject.toml 2>/dev/null | grep -A 5 "pytest\|unittest"
 
 # 3. Найди существующие тесты для фичи
-find . -name "*.test.*" -o -name "*.spec.*" | xargs grep -l "$ARGUMENTS" 2>/dev/null | head -10
+rg "def test.*$ARGUMENTS" tests/ 2>/dev/null | head -10
 ```
 
 ## Testing Process
@@ -33,12 +54,38 @@ find . -name "*.test.*" -o -name "*.spec.*" | xargs grep -l "$ARGUMENTS" 2>/dev/
 
 ```bash
 # Запусти тесты для конкретной фичи
-npm test -- --grep "$ARGUMENTS" --coverage
-# или
 pytest -k "$ARGUMENTS" -v --cov
 
 # Если нет специфичных тестов, запусти все
-npm test
+pytest tests/ -v
+
+# С coverage report
+pytest --cov=src --cov-report=term-missing
+```
+
+```python
+# Примеры pytest тестов
+
+# Unit test
+def test_feature_returns_expected():
+    result = feature_function("input")
+    assert result == "expected"
+
+# Integration test с fixture
+@pytest.fixture
+def client():
+    from fastapi.testclient import TestClient
+    return TestClient(app)
+
+def test_api_endpoint(client):
+    response = client.get("/api/endpoint")
+    assert response.status_code == 200
+
+# Async test
+@pytest.mark.asyncio
+async def test_async_feature():
+    result = await async_function()
+    assert result is not None
 ```
 
 ### 2. E2E Testing
@@ -94,12 +141,29 @@ curl -s -w "\nStatus: %{http_code}\n" http://localhost:3000/api/notfound
 
 ```bash
 # Проверь coverage после тестов
-npm test -- --coverage
-# или
-pytest --cov --cov-report=term-missing
+pytest --cov=src --cov-report=term-missing
 
 # Coverage должен быть >= предыдущего значения
+# Минимум 80% для новых файлов
 ```
+
+## Test Timing Constraints
+
+| Тип теста | Таймаут | Общее время |
+|-----------|---------|-------------|
+| Unit | 5 сек/тест | < 30 сек total |
+| Integration | 30 сек/тест | < 2 мин total |
+| E2E | 60 сек/тест | < 5 мин total |
+
+## Error Handling
+
+| Проблема | Решение |
+|----------|---------|
+| Server already running | `lsof -i :8000` и kill, или другой порт |
+| Flaky test | Перезапустить 3 раза, если всё ещё flaky → `@pytest.mark.skip` |
+| Timeout | Увеличить timeout или оптимизировать тест |
+| Missing fixtures | Проверить `conftest.py` |
+| Import errors | Проверить `PYTHONPATH` и `__init__.py` |
 
 ## Output Format
 
@@ -192,6 +256,31 @@ if [ -n "$DEV_PID" ]; then
   kill $DEV_PID 2>/dev/null
 fi
 ```
+
+## Constraints
+
+### ЗАПРЕЩЕНО
+- Тесты зависящие друг от друга
+- Hardcoded test data в коде (используй fixtures)
+- `time.sleep()` в тестах (используй mocking)
+- Пропускать edge cases
+- Игнорировать flaky tests
+
+### ОБЯЗАТЕЛЬНО
+- Каждый тест независим
+- Fixtures для shared data
+- Cleanup после тестов
+- Документировать все найденные баги
+
+## Quality Checklist
+
+Перед завершением проверь:
+
+- [ ] Все сценарии из матрицы протестированы
+- [ ] Coverage не ниже baseline
+- [ ] Нет flaky tests
+- [ ] Все баги задокументированы
+- [ ] Dev server остановлен
 
 ## Important Notes
 

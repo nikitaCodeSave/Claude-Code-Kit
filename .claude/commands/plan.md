@@ -4,7 +4,34 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 # Plan Feature/Task: $ARGUMENTS
 
+> `$ARGUMENTS` — описание задачи после команды
+> Пример: `/plan user authentication` → $ARGUMENTS = "user authentication"
+
 Создай детальный план для задачи. **НЕ ПИШИ КОД.**
+
+## Context Discovery
+
+При вызове СНАЧАЛА:
+
+```bash
+# 1. Текущий прогресс
+cat .claude-workspace/progress.md 2>/dev/null | tail -20
+
+# 2. Есть ли уже план?
+cat .claude-workspace/current-task.md 2>/dev/null | head -15
+
+# 3. Недавние коммиты (контекст)
+git log --oneline -5 2>/dev/null
+```
+
+## Task Size Matrix
+
+| Размер | Строк кода | Шагов | Подход |
+|--------|------------|-------|--------|
+| S | < 50 | 1-3 | Простой план |
+| M | 50-200 | 4-6 | Детальный план |
+| L | 200-500 | 7-10 | Декомпозиция на подзадачи |
+| XL | > 500 | 10+ | Несколько /plan сессий |
 
 ## Process
 
@@ -12,10 +39,13 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 
 ```bash
 # Изучи структуру проекта
-tree -L 2 -I 'node_modules|__pycache__|.git' | head -40
+tree -L 2 -I 'node_modules|__pycache__|.git|.venv|venv' | head -40
 
-# Найди похожие реализации
-rg "similar_pattern" --type-add 'code:*.{ts,py,js}' -t code -l | head -10
+# Python: найти сервисы/классы
+rg "class.*Service|class.*Handler|class.*Manager" --type py -l | head -10
+
+# Python: найти эндпоинты FastAPI/Flask
+rg "@(app|router)\.(get|post|put|delete|patch)" --type py -C 2 | head -30
 
 # Проверь существующие паттерны
 cat CLAUDE.md 2>/dev/null | head -50
@@ -63,13 +93,14 @@ cat CLAUDE.md 2>/dev/null | head -50
    ...
 
 ### Files to Create
-- `path/to/new.ts` — [purpose]
+- `src/services/new_service.py` — [purpose]
+- `tests/test_new_service.py` — [tests]
 
 ### Files to Modify
-- `path/to/existing.ts` — [what changes]
+- `src/main.py` — [what changes]
 
 ### Dependencies
-- [если нужны новые пакеты]
+- [если нужны новые пакеты в pyproject.toml]
 
 ### Success Criteria
 - [ ] All tests pass
@@ -94,15 +125,37 @@ echo "" >> .claude-workspace/progress.md
 # Если новая фича - добавь в features.json
 ```
 
-## Rules
+## Constraints
 
-- Используй **"think hard"** или **"ultrathink"** для сложных задач
-- НЕ начинай писать код пока план не одобрен пользователем
-- Каждый шаг должен быть выполним за < 30 минут
-- Спроси подтверждение перед переходом к `/project:implement`
+### ЗАПРЕЩЕНО
+- Писать код в плане (только описания)
+- Начинать реализацию без approval пользователя
+- Шаги длиннее 30 минут
+- Пропускать тесты в плане
+
+### ОБЯЗАТЕЛЬНО
+- Указать риски для каждого шага M/L/XL
+- Включить тесты в каждый шаг
+- Использовать "think hard" или "ultrathink" для сложных задач
+
+## Approval Process
+
+После создания плана:
+
+1. Покажи краткое summary (5-7 пунктов):
+   - Цель
+   - Размер (S/M/L/XL)
+   - Количество шагов
+   - Ключевые файлы
+   - Основные риски
+
+2. Спроси явно:
+   > "План готов. Продолжить с `/implement`?"
+
+3. Дождись явного подтверждения ("да", "proceed", "начинай")
 
 ## Output
 
 После создания плана:
 1. Покажи краткое summary
-2. Спроси: "План готов. Начинаем имплементацию с `/project:implement`?"
+2. Спроси: "План готов. Начинаем имплементацию с `/implement`?"

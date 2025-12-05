@@ -6,6 +6,33 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 Инициализируй проект для эффективной работы с Claude Code.
 
+## Context Discovery
+
+При вызове СНАЧАЛА проверь что уже существует:
+
+```bash
+# 1. Существующий workspace
+ls -la .claude-workspace/ 2>/dev/null && echo "Workspace exists!"
+
+# 2. Существующая конфигурация Claude
+ls -la .claude/ 2>/dev/null && echo "Claude config exists!"
+
+# 3. CLAUDE.md
+cat CLAUDE.md 2>/dev/null | head -20 && echo "CLAUDE.md exists!"
+
+# 4. Git status
+git status --short 2>/dev/null || echo "Not a git repo"
+```
+
+## Pre-existing Files Check
+
+| Файл | Если существует |
+|------|-----------------|
+| .claude-workspace/ | Спросить: merge или skip? |
+| CLAUDE.md | Merge секции, не перезаписывать |
+| .gitignore | Append только новые строки |
+| .claude/ | Оставить как есть |
+
 ## Process
 
 ### 1. Analyze Project
@@ -150,25 +177,42 @@ if [ -z "$(ls -A .claude/agents/ 2>/dev/null)" ]; then
 fi
 ```
 
-### 6. Git Setup
+### 6. Git Setup (Idempotent)
 
 ```bash
-# Add to .gitignore if needed
-if ! grep -q "CLAUDE.local.md" .gitignore 2>/dev/null; then
-  echo "" >> .gitignore
-  echo "# Claude Code local files" >> .gitignore
-  echo "CLAUDE.local.md" >> .gitignore
-  echo ".claude/settings.local.json" >> .gitignore
-  echo ".claude-workspace/session-log.txt" >> .gitignore
-fi
+# Add to .gitignore if needed (idempotent - проверяем перед добавлением)
+grep -q "CLAUDE.local.md" .gitignore 2>/dev/null || echo "CLAUDE.local.md" >> .gitignore
+grep -q "settings.local.json" .gitignore 2>/dev/null || echo ".claude/settings.local.json" >> .gitignore
 
-# Initial commit
-git add .claude-workspace/
-git add .claude/
-git add CLAUDE.md
-git add .gitignore
-git commit -m "chore: initialize Claude Code workspace"
+# Initial commit (только если есть изменения)
+if [ -n "$(git status --porcelain .claude-workspace/ .claude/ CLAUDE.md .gitignore 2>/dev/null)" ]; then
+  git add .claude-workspace/ .claude/ CLAUDE.md .gitignore 2>/dev/null
+  git commit -m "chore: initialize Claude Code workspace"
+else
+  echo "No changes to commit"
+fi
 ```
+
+## Error Handling
+
+| Ошибка | Действие |
+|--------|----------|
+| No write permissions | Предупредить и остановиться |
+| Directory exists | Спросить пользователя: skip или overwrite |
+| Git not initialized | Предложить `git init` |
+| Files modified | Предупредить о перезаписи |
+
+## Constraints
+
+### ЗАПРЕЩЕНО
+- Перезаписывать существующие файлы без спроса
+- Добавлять дубликаты в .gitignore
+- Коммитить без проверки что есть изменения
+
+### ОБЯЗАТЕЛЬНО
+- Проверить существование перед созданием
+- Использовать idempotent команды
+- Спрашивать при конфликтах
 
 ## Output
 

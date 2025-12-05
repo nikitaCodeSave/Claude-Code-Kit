@@ -4,17 +4,50 @@ allowed-tools: Read, Edit, Bash, Grep, Glob
 ---
 # Quick Fix: $ARGUMENTS
 
+> `$ARGUMENTS` — описание бага после команды
+> Пример: `/quick-fix login fails with spaces` → $ARGUMENTS = "login fails with spaces"
+
 Быстрое исправление небольшого бага БЕЗ полного цикла планирования.
+
+## Context Discovery
+
+При вызове СНАЧАЛА:
+
+```bash
+# 1. Текущая задача (если есть)
+cat .claude-workspace/current-task.md 2>/dev/null | head -10
+
+# 2. Недавние изменения (возможная причина бага)
+git diff --stat HEAD~3 2>/dev/null | head -10
+
+# 3. Tech stack
+cat pyproject.toml 2>/dev/null | head -10 || cat package.json 2>/dev/null | head -10
+```
+
+## Quick Fix Criteria
+
+| Критерий | Quick Fix | Нужен /plan |
+|----------|-----------|-------------|
+| Строк кода | < 20 | > 20 |
+| Файлов | 1-2 | > 2 |
+| Тестов новых | 1 | > 3 |
+| Зависимости | 0 новых | Любые новые |
+| API контракт | Без изменений | Меняется |
+
+Если сложнее → используй `/plan`
 
 ## Constraints
 
-⚠️ Используй ТОЛЬКО если:
-- Изменения < 20 строк кода
-- Очевидный баг с понятным fix
-- НЕ новая функциональность
-- НЕ рефакторинг
+### ЗАПРЕЩЕНО
+- Рефакторинг "заодно"
+- Изменение API контракта
+- Добавление новых зависимостей
+- Коммит без теста на баг
 
-Если сложнее → используй `/project:plan`
+### ОБЯЗАТЕЛЬНО
+- Один тест воспроизводящий баг
+- Минимальные изменения
+- Коммит сразу после фикса
 
 ## Process
 
@@ -37,13 +70,17 @@ rg "error|Error|ERROR" --type-add 'code:*.{ts,js,py}' -t code | grep -i "$ARGUME
 
 ### 3. Write Test First
 
-```bash
-# Напиши тест воспроизводящий баг
-# Тест ДОЛЖЕН УПАСТЬ
+```python
+# Напиши тест воспроизводящий баг в tests/test_*.py
+def test_bug_description():
+    """Тест ДОЛЖЕН УПАСТЬ до фикса."""
+    result = function_with_bug(problematic_input)
+    assert result == expected_value
+```
 
-# Запусти тест
-npm test -- --grep "test for bug"
-# Должен быть FAIL
+```bash
+# Запусти тест (должен FAIL)
+pytest tests/test_module.py::test_bug_description -v
 ```
 
 ### 4. Fix Minimally
@@ -56,14 +93,16 @@ npm test -- --grep "test for bug"
 
 ```bash
 # Тест теперь проходит
-npm test -- --grep "test for bug"
+pytest tests/test_module.py::test_bug_description -v
 # Должен быть PASS
 
 # Все остальные тесты тоже
-npm test
+pytest tests/ -v
 
 # Linting OK
-npm run lint
+ruff check src/
+# или
+ruff check . --fix
 ```
 
 ### 6. Commit
@@ -79,7 +118,7 @@ git commit -m "fix($SCOPE): $ARGUMENTS
 ## Output Format
 
 ```markdown
-## ✅ Quick Fix Complete: $ARGUMENTS
+## Quick Fix Complete: $ARGUMENTS
 
 ### Problem
 [Что было сломано — 1-2 предложения]
@@ -88,10 +127,10 @@ git commit -m "fix($SCOPE): $ARGUMENTS
 [Что исправили — 1-2 предложения]
 
 ### Changes
-- `path/to/file.ts:42` — [description]
+- `src/module.py:42` — [description]
 
 ### Test Added
-- `test_file.ts::test_name` — ensures bug doesn't regress
+- `tests/test_module.py::test_bug_description` — ensures bug doesn't regress
 
 ### Commit
 `abc1234` fix(scope): $ARGUMENTS

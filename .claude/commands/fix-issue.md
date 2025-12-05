@@ -4,7 +4,28 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 # Fix GitHub Issue: $ARGUMENTS
 
+> `$ARGUMENTS` — номер issue
+> Пример: `/fix-issue 123` → $ARGUMENTS = "123"
+
 Проанализируй и исправь GitHub issue #$ARGUMENTS.
+
+## Context Discovery
+
+При вызове СНАЧАЛА:
+
+```bash
+# 1. Проверь gh CLI
+gh auth status 2>/dev/null || echo "WARNING: gh not authenticated"
+
+# 2. Текущая задача
+cat .claude-workspace/current-task.md 2>/dev/null | head -10
+
+# 3. Git status
+git status --short 2>/dev/null
+
+# 4. Текущая ветка
+git branch --show-current 2>/dev/null
+```
 
 ## Pre-Requisites
 
@@ -114,31 +135,41 @@ git checkout -b fix/issue-$ARGUMENTS
 
 # 2. Напиши тест воспроизводящий баг
 # [create test file or add test case]
+```
 
+```python
+# tests/test_issue_123.py
+def test_issue_123_regression():
+    """Тест воспроизводящий баг из issue #123."""
+    result = problematic_function(edge_case_input)
+    assert result == expected_output
+```
+
+```bash
 # 3. Запусти тест - ДОЛЖЕН УПАСТЬ
-npm test -- --grep "issue $ARGUMENTS"
+pytest tests/test_issue_$ARGUMENTS.py -v
 
 # 4. Исправь код
 # [make minimal changes to fix]
 
 # 5. Запусти тест - ДОЛЖЕН ПРОЙТИ
-npm test -- --grep "issue $ARGUMENTS"
+pytest tests/test_issue_$ARGUMENTS.py -v
 
 # 6. Запусти ВСЕ тесты
-npm test
+pytest tests/ -v
 ```
 
 ### 6. Verify
 
 ```bash
 # Все тесты проходят
-npm test
+pytest tests/ -v
 
 # Linting OK
-npm run lint
+ruff check src/
 
 # Type checking OK
-npm run typecheck 2>/dev/null || true
+mypy src/ 2>/dev/null || echo "mypy not configured"
 
 # Если UI issue - проверь визуально
 # [manual verification if needed]
@@ -265,10 +296,37 @@ Cannot reproduce issue #$ARGUMENTS locally
 3. Try on different environment
 ```
 
-## Rules
+## Extended Error Handling
 
-- **ВСЕГДА** создавай тест воспроизводящий баг ПЕРЕД fix
-- **НИКОГДА** не закрывай issue без теста
-- Делай **минимальные** изменения для fix
-- **НЕ** рефактори "заодно"
-- Если fix сложнее чем ожидалось — используй `/project:plan`
+| Ситуация | Действие |
+|----------|----------|
+| gh not installed | Предложить `brew install gh` или ручной workaround |
+| gh not authenticated | Запустить `gh auth login` |
+| Issue closed | Проверить PR, сообщить пользователю |
+| Issue already assigned | Спросить продолжать ли |
+| No permissions to repo | Предложить fork |
+| Cannot reproduce | Запросить больше информации |
+
+## Keyword Extraction Examples
+
+```bash
+# Из title: "Login fails with special characters"
+rg "login|Login" --type py -C 3
+rg "special.*character|character.*special" --type py -C 2
+
+# Из labels: "bug", "authentication"
+rg "auth|authenticate" --type py -l
+```
+
+## Constraints
+
+### ЗАПРЕЩЕНО
+- Push без тестов
+- PR без описания
+- Закрывать issue без PR
+- Рефакторинг "заодно"
+
+### ОБЯЗАТЕЛЬНО
+- Упомянуть issue в commit: `fix: ... (closes #123)`
+- Тест воспроизводящий баг ПЕРЕД fix
+- Минимальные изменения

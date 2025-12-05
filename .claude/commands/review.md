@@ -6,6 +6,19 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Проведи code review недавних изменений как **НЕЗАВИСИМЫЙ** Review Agent.
 
+## Context Discovery
+
+При вызове СНАЧАЛА:
+
+```bash
+# 1. Что изменилось
+git log --oneline -5 2>/dev/null
+git diff --stat HEAD~1 2>/dev/null | tail -5
+
+# 2. Что должно было быть сделано
+cat .claude-workspace/current-task.md 2>/dev/null | head -10
+```
+
 ## Arguments
 
 `$ARGUMENTS`:
@@ -231,6 +244,35 @@ rg "(console\.(log|debug|info)|print\()" --type-add 'code:*.{ts,js,py}' -t code 
 
 💡 After fixes, run `/project:review staged` to re-review
 ```
+
+## Example Output
+
+```markdown
+## Code Review: feat(auth): add JWT validation
+
+**Scope:** 3 files, +127/-23 lines
+**Verdict:** ✅ APPROVED with suggestions
+
+### MEDIUM — Consider caching
+- File: src/auth/jwt.py:45
+- Issue: Token validation on every request
+- Fix: Add Redis cache for validated tokens
+
+### What's Good
+- Clear separation of concerns
+- Comprehensive tests (92% coverage)
+- Good error messages
+```
+
+## Quality Checklist
+
+Перед завершением проверь:
+
+- [ ] Все automated checks запущены
+- [ ] Критические проблемы описаны с примерами кода
+- [ ] Позитивные аспекты упомянуты
+- [ ] Конкретные actions предложены
+- [ ] Verdict соответствует findings
 
 ## Rules
 
