@@ -30,7 +30,7 @@ cat package.json 2>/dev/null | jq '.scripts.test' || \
 cat pyproject.toml 2>/dev/null | grep -A5 "\[tool.pytest"
 
 # 5. Dev server работает? (если frontend)
-curl -s http://localhost:3000/health 2>/dev/null || echo "No dev server"
+curl -s --max-time 2 http://localhost:3000/health 2>/dev/null || echo "No dev server"
 ```
 
 ## Tool Usage Priority
@@ -89,16 +89,56 @@ Types:
 - test: добавление/изменение тестов
 - docs: документация
 - chore: maintenance tasks
+```
 
-Example:
+### Примеры коммитов (Python)
+
+**feat (новая функция):**
+```
 feat(auth): add JWT token validation
 
-- Add validateToken() function
+- Add validate_token() function
 - Add tests for valid/invalid tokens
 - Update auth middleware
 
 Step 3/5 of F002
 ```
+
+**fix (исправление):**
+```
+fix(db): prevent connection leak on timeout
+
+- Add context manager for connections
+- Ensure cleanup in finally block
+```
+
+**test (тесты):**
+```
+test(api): add edge case tests for user endpoint
+
+- Test empty request body
+- Test invalid email format
+- Coverage: 65% → 78%
+```
+
+## Atomic Commit Definition
+
+**Атомарный коммит** — одно логическое изменение, которое можно откатить без поломки функциональности.
+
+**ПРАВИЛЬНО (атомарно):**
+```
+test(auth): add test for validate_token
+feat(auth): implement validate_token function
+refactor(auth): rename token → access_token
+```
+
+**НЕПРАВИЛЬНО (не атомарно):**
+```
+feat(auth): add JWT validation AND update middleware AND fix permissions
+# → Разбей на 3 коммита!
+```
+
+**Правило:** Если в сообщении есть "и" / "AND" / "+" → разбей на отдельные коммиты
 
 ## Clean State Checklist
 
@@ -120,20 +160,36 @@ Step 3/5 of F002
 # 1. Что сломано?
 git status
 git diff
-npm test 2>&1 | tail -50
+pytest -v 2>&1 | tail -50  # или npm test для JS
 
-# 2. Откатить если нужно
-git stash                    # сохранить и откатить
+# 2. Откатить БЕЗОПАСНО
+git stash                    # сохранить изменения и откатить
+git stash pop                # вернуть сохранённые изменения
 # или
 git checkout -- <file>       # откатить конкретный файл
-# или  
-git reset --hard HEAD~1      # откатить последний коммит
+
+# ЗАПРЕЩЕНО:
+# git reset --hard HEAD~1    # деструктивная команда!
 
 # 3. Задокументировать
 echo "$(date): Issue - [description]" >> .claude-workspace/progress.md
 
 # 4. Начать шаг заново
 ```
+
+## When to Ask for Help
+
+Если застрял > 15 минут:
+
+1. Запиши в progress.md:
+   ```
+   ## BLOCKER: [описание проблемы]
+   - Время: 15+ мин
+   - Попытки: [что пробовал]
+   - Ошибка: [текст ошибки]
+   ```
+
+2. Сообщи пользователю и жди ответа
 
 ## Constraints
 

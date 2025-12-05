@@ -1,56 +1,62 @@
-# Project: Claude Code Kit
+# CLAUDE.md
 
-## Overview
-A template/toolkit project that provides structure, agents, and slash commands for efficient Claude Code workflows. This project is designed to be copied and adapted for new projects.
+Этот файл содержит инструкции для Claude Code (claude.ai/code) при работе с кодом в этом репозитории.
 
-## Tech Stack
-- Documentation: Markdown
-- Configuration: JSON
-- Shell scripts for hooks
-- Git for version control
+## Обзор
 
-## Project Structure
-- `.claude/` - Claude Code configuration
-  - `agents/` - Agent prompts (lead, code, review, test, explore, doc)
-  - `commands/` - Slash commands (plan, implement, review, test, etc.)
-  - `hooks/` - Shell hooks (validate-bash.sh)
-  - `settings.local.json` - Local settings
-- `.claude-workspace/` - Working files for tracking
-  - `progress.md` - Session logs
-  - `features.json` - Feature tracking
-  - `current-task.md` - Active task details
-  - `decisions.md` - Architectural decisions
-- `docs/` - Documentation
+Claude Code Kit — шаблонный проект со структурой, агентами и slash-командами для работы с Claude Code. Копируйте и адаптируйте под свои проекты.
 
-## Commands
-- `/init-project` - Initialize a new project with Claude Code structure
-- `/plan [feature]` - Create a detailed implementation plan
-- `/implement` - Implement current task from plan
-- `/review` - Independent code review of changes
-- `/test [feature]` - End-to-end testing
-- `/quick-fix [bug]` - Quick fix for small bugs
-- `/status` - Check project status
+## Правила сессии
 
-## Agents
-- **lead-agent** - Planning and task decomposition
-- **code-agent** - TDD implementation
-- **review-agent** - Independent code review
-- **test-agent** - QA and testing
-- **explore-agent** - Codebase exploration
-- **doc-agent** - Documentation
+1. **НАЧАЛО**: Прочитай `.claude-workspace/progress.md` для контекста
+2. **КОНЕЦ**: Обнови `progress.md` с результатами работы
+3. Работай над ОДНОЙ фичей за раз
+4. Используй `/plan` для фич > 50 строк кода
+5. Используй `/review` после реализации
 
-## Workflow Rules
-1. ALWAYS read `.claude-workspace/progress.md` at session start
-2. ALWAYS update progress.md after completing work
-3. Work on ONE feature at a time
-4. Use `/plan` before implementing any feature > 50 LOC
-5. Use `/review` after implementation completion
+## Команды
 
-## Git Conventions
-- Commit format: `type(scope): description`
-- Types: feat, fix, docs, chore, refactor
+| Команда | Когда использовать |
+|---------|-------------------|
+| `/plan [feature]` | Перед реализацией фич > 50 строк кода |
+| `/implement` | После одобрения плана, выполняет TDD workflow |
+| `/review` | После реализации, перед merge |
+| `/test [feature]` | E2E тестирование готовых фич |
+| `/quick-fix [bug]` | Только для мелких багов < 20 строк |
+| `/status` | Проверить текущее состояние и следующие шаги |
 
-## Important Notes
-- This is a template project - copy and adapt for your needs
-- All agents use OODA loop methodology
-- TDD workflow is enforced (tests before code)
+## Workflow
+
+```
+/plan → current-task.md → /implement → атомарные коммиты → /review → merge
+```
+
+**TDD Цикл** (контролируется code-agent):
+1. Напиши тест (должен УПАСТЬ)
+2. Напиши минимум кода (тест ПРОХОДИТ)
+3. Рефактори
+4. Закоммить
+
+## Агенты
+
+| Агент | Роль | Для чего |
+|-------|------|----------|
+| `lead-agent` | Архитектор | Планирование, декомпозиция |
+| `code-agent` | Разработчик | TDD реализация |
+| `review-agent` | Ревьюер | Независимая проверка кода |
+| `test-agent` | QA | Тестирование, поиск багов |
+| `explore-agent` | Разведчик | Быстрый поиск по коду |
+| `doc-agent` | Документатор | Документация |
+
+## Ключевые файлы
+
+- `.claude-workspace/progress.md` - Память между сессиями (читай первым!)
+- `.claude-workspace/current-task.md` - План текущей задачи
+- `.claude-workspace/decisions.md` - Лог архитектурных решений
+- `.claude/settings.local.json` - Настройки permissions и hooks
+
+## Git-конвенции
+
+Формат: `type(scope): description`
+
+Типы: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`

@@ -82,45 +82,53 @@
 
 ## Фаза 3: Агенты (детальный разбор)
 
-> **Статус: ОЖИДАЕТ**
+> **Статус: ЗАВЕРШЕНА** (2025-12-05)
 
 ### Чек-лист
 
-- [ ] **3.1 lead-agent.md** (137 строк) — Оценка: 8/10
-  - [ ] OODA цикл корректен
-  - [ ] Context Discovery скрипты работают
-  - [ ] Примеры output format полные
-  - [ ] Delegation rules актуальны
+- [x] **3.1 lead-agent.md** (137→157 строк) — Оценка: 8→9/10
+  - [x] OODA цикл корректен
+  - [x] Context Discovery скрипты работают
+  - [x] Allowed-tools исправлены (добавлены find, cat, head, jq, ls)
+  - [x] Delegation rules актуальны (добавлена таблица "Когда делегировать")
+  - [x] Plan Size Constraints добавлены
 
-- [ ] **3.2 code-agent.md** (154 строки) — Оценка: 9/10
-  - [ ] TDD workflow корректен
-  - [ ] Git команды безопасны
-  - [ ] Error recovery адекватен
-  - [ ] Инструменты соответствуют задачам
+- [x] **3.2 code-agent.md** (154→195 строк) — Оценка: 9→9.5/10
+  - [x] TDD workflow корректен
+  - [x] Git команды безопасны (удалён git reset --hard)
+  - [x] Error recovery адекватен (только safe методы)
+  - [x] Atomic Commit определение добавлено
+  - [x] Python примеры коммитов добавлены
+  - [x] "When to Ask for Help" секция добавлена
 
-- [ ] **3.3 test-agent.md** (204 строки) — Оценка: 8/10
-  - [ ] Test scenarios матрица полная
-  - [ ] Примеры для Python (pytest) добавлены
-  - [ ] MCP tools упомянуты корректно
-  - [ ] E2E процесс описан
+- [x] **3.3 test-agent.md** (204→324 строки) — Оценка: 8→9/10
+  - [x] Test scenarios матрица полная
+  - [x] Примеры для Python (pytest) добавлены
+  - [x] Async Testing секция добавлена
+  - [x] Mocking Strategy секция добавлена
+  - [x] Test Timing Constraints добавлены
+  - [x] Naming Conventions добавлены
 
-- [ ] **3.4 review-agent.md** (187 строк) — Оценка: 9/10
-  - [ ] Auto-REJECT критерии адекватны
-  - [ ] Security patterns работают
-  - [ ] Output format полный
-  - [ ] Checklist исчерпывающий
+- [x] **3.4 review-agent.md** (187→268 строк) — Оценка: 9→9.5/10
+  - [x] Auto-REJECT критерии адекватны
+  - [x] Security patterns работают
+  - [x] Example Findings добавлены (6 примеров по severity)
+  - [x] Context-Aware Review добавлен
 
-- [ ] **3.5 explore-agent.md** (142 строки) — Оценка: 8/10
-  - [ ] Search strategies покрывают все случаи
-  - [ ] Constraints ясны (определить "большой файл")
-  - [ ] Response Guidelines адекватны
+- [x] **3.5 explore-agent.md** (142→200 строк) — Оценка: 8→8.5/10
+  - [x] Search strategies покрывают все случаи
+  - [x] Constraints уточнены (> 500 строк = большой файл)
+  - [x] Fallback Strategy добавлена
+  - [x] Example Output добавлен
 
-- [ ] **3.6 doc-agent.md** (30 строк) — Оценка: 2/10 — **КРИТИЧНО!**
-  - [ ] Добавить OODA цикл
-  - [ ] Добавить примеры для README, API docs
-  - [ ] Добавить Output format
-  - [ ] Добавить Context Discovery
-  - [ ] Расширить до 80-100+ строк
+- [x] **3.6 doc-agent.md** (30→320 строк) — Оценка: 2→9/10 — **ИСПРАВЛЕНО!**
+  - [x] Context Discovery добавлен
+  - [x] Tool Usage Priority добавлен
+  - [x] 5 типов документации с примерами (README, API, Architecture, Comments, CHANGELOG)
+  - [x] Response Guidelines таблица добавлена
+  - [x] Constraints секция добавлена
+  - [x] Templates для Python проектов
+  - [x] Quality Checklist добавлен
 
 ---
 
@@ -242,7 +250,7 @@
 ```
 Фаза 1 [##########] 100% — ЗАВЕРШЕНА
 Фаза 2 [##########] 100% — ЗАВЕРШЕНА
-Фаза 3 [          ]   0% — ожидает
+Фаза 3 [##########] 100% — ЗАВЕРШЕНА
 Фаза 4 [##        ]  25% — частично (fix, status, plan исправлены)
 Фаза 5 [##        ]  20% — частично (session-log удалён)
 Фаза 6 [          ]   0% — ожидает
@@ -253,9 +261,9 @@
 
 ## Следующие шаги
 
-1. **Рекомендуется:** Закоммитить изменения Фаз 1 и 2
-2. **Далее:** Фаза 3 (детальный разбор агентов)
-3. **Приоритет:** doc-agent.md требует полной переработки (критический — 30 строк → 100+)
+1. **Рекомендуется:** Закоммитить изменения Фаз 1, 2 и 3
+2. **Далее:** Фаза 4 (детальный разбор команд)
+3. **Приоритет:** implement.md, quick-fix.md требуют проверки
 
 ---
 
@@ -291,4 +299,30 @@
 
 ОБНОВЛЕНО:
 └── REFACTORING-PLAN.md (этот файл)
+```
+
+---
+
+## Файлы изменённые в Фазе 3
+
+```
+ПОЛНАЯ ПЕРЕРАБОТКА:
+└── .claude/agents/doc-agent.md        (30→320 строк) — Python templates, constraints, examples
+
+СУЩЕСТВЕННЫЕ ИЗМЕНЕНИЯ:
+├── .claude/agents/test-agent.md       (204→324 строк) — Python-first, async, mocking
+├── .claude/agents/review-agent.md     (187→268 строк) — example findings, context-aware
+├── .claude/agents/code-agent.md       (154→195 строк) — удалён git reset, atomic commits
+└── .claude/agents/lead-agent.md       (137→157 строк) — allowed-tools, delegation table
+
+МИНОРНЫЕ ИЗМЕНЕНИЯ:
+└── .claude/agents/explore-agent.md    (142→200 строк) — file size constraints, fallback
+
+ОБНОВЛЕНО:
+└── REFACTORING-PLAN.md (этот файл)
+
+ПРИНЯТЫЕ РЕШЕНИЯ:
+├── git reset --hard: УДАЛЁН (деструктивная команда)
+├── Основной язык примеров: Python
+└── doc-agent: 150-180 строк → фактически 320 строк
 ```

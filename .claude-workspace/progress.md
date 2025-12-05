@@ -31,6 +31,33 @@
 
 ---
 
+## Session: 2025-12-05 - Фаза 3: Детальный разбор агентов
+
+### Started
+- **Task:** Рефакторинг всех 6 агентов согласно REFACTORING-PLAN.md
+- **Context:** Фазы 1-2 завершены, doc-agent критически неполный (2/10)
+
+### Completed
+- [x] doc-agent.md — полная переработка (30→320 строк, 2→9/10)
+- [x] code-agent.md — удалён git reset --hard, добавлены Python примеры (154→195 строк)
+- [x] lead-agent.md — исправлены allowed-tools, добавлена delegation table (137→157 строк)
+- [x] test-agent.md — переписан на Python-first, добавлены async/mocking (204→324 строк)
+- [x] review-agent.md — добавлены example findings (187→268 строк)
+- [x] explore-agent.md — уточнены constraints, добавлен fallback (142→200 строк)
+- [x] REFACTORING-PLAN.md — обновлён статус Фазы 3
+
+### Key Decisions
+- git reset --hard: УДАЛЁН (деструктивная команда)
+- Основной язык примеров: Python
+- doc-agent расширен больше плана: 150-180 → 320 строк
+
+### Notes for Next Session
+- Фаза 3 завершена на 100%
+- Все агенты теперь имеют оценку ≥ 8.5/10
+- Следующий шаг: Фаза 4 (команды) или коммит изменений
+
+---
+
 ## Session: 2025-12-04 23:30 - Project Initialization
 
 ### Started

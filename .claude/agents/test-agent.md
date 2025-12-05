@@ -65,17 +65,24 @@ cat jest.config.* 2>/dev/null || cat .coveragerc 2>/dev/null
 - Быстрые (< 100ms на тест)
 - Используй mocks для зависимостей
 
-```typescript
-// Example: Unit test
-describe('validateEmail', () => {
-  it('returns true for valid email', () => {
-    expect(validateEmail('test@example.com')).toBe(true);
-  });
-  
-  it('returns false for invalid email', () => {
-    expect(validateEmail('invalid')).toBe(false);
-  });
-});
+```python
+# Example: Unit test (pytest)
+import pytest
+from myapp.validators import validate_email
+
+def test_validate_email_returns_true_for_valid():
+    assert validate_email("test@example.com") is True
+
+def test_validate_email_returns_false_for_invalid():
+    assert validate_email("invalid") is False
+
+def test_validate_email_handles_empty_string():
+    assert validate_email("") is False
+
+def test_validate_email_handles_none():
+    assert validate_email(None) is False
+
+# TypeScript/Jest эквивалент: см. Jest docs
 ```
 
 ### Integration Tests
@@ -83,6 +90,87 @@ describe('validateEmail', () => {
 - Могут использовать реальную DB (test instance)
 - Медленнее unit тестов
 - Проверяют что компоненты работают ВМЕСТЕ
+
+```python
+# Example: Integration test with FastAPI
+import pytest
+from fastapi.testclient import TestClient
+from myapp.main import app
+
+@pytest.fixture
+def client():
+    return TestClient(app)
+
+def test_create_user_integration(client):
+    response = client.post(
+        "/api/users",
+        json={"email": "test@example.com", "name": "Test"}
+    )
+    assert response.status_code == 201
+    assert response.json()["email"] == "test@example.com"
+
+def test_get_user_not_found(client):
+    response = client.get("/api/users/99999")
+    assert response.status_code == 404
+```
+
+### Async Testing (pytest-asyncio)
+
+```python
+import pytest
+from httpx import AsyncClient
+from myapp.main import app
+
+@pytest.mark.asyncio
+async def test_async_endpoint():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get("/api/data")
+        assert response.status_code == 200
+        assert "items" in response.json()
+
+@pytest.mark.asyncio
+async def test_async_with_timeout():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        # Таймаут 5 секунд
+        response = await client.get("/api/slow", timeout=5.0)
+        assert response.status_code == 200
+```
+
+### Mocking Strategy
+
+```python
+from unittest.mock import patch, MagicMock
+import pytest
+
+# Mock external HTTP API
+def test_external_api_call(requests_mock):
+    requests_mock.get(
+        "https://api.example.com/data",
+        json={"id": 1, "name": "Test"}
+    )
+    result = fetch_external_data()
+    assert result["id"] == 1
+
+# Mock with patch
+@patch("myapp.services.email.send_email")
+def test_user_registration(mock_send_email):
+    mock_send_email.return_value = True
+    result = register_user("test@example.com")
+    assert result.success is True
+    mock_send_email.assert_called_once()
+
+# Fixture mock
+@pytest.fixture
+def mock_db():
+    with patch("myapp.db.get_connection") as mock:
+        mock.return_value = MagicMock()
+        yield mock
+```
+
+**Правила мокирования:**
+- Мокай внешние зависимости (HTTP, DB, file system)
+- НЕ мокай тестируемый компонент
+- Документируй почему нужен каждый mock
 
 ### E2E Tests
 - Тестируют полный user flow
@@ -192,9 +280,10 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/notfound
 
 ### ❌ ЗАПРЕЩЕНО
 - Изменять логику тестов без понимания intent
-- Добавлять `.only()` или `.skip()` в коммиты
+- Добавлять `.only()` или `@pytest.mark.skip` в коммиты
 - Изменять код НЕ связанный с тестированием
 - Удалять failing tests без исправления
+- Добавлять `time.sleep()` как фикс для flaky tests
 
 ### ✅ ОБЯЗАТЕЛЬНО
 - Тесты должны быть НЕЗАВИСИМЫ друг от друга
@@ -202,3 +291,33 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/notfound
 - Тестировать BEHAVIOR, не implementation details
 - Использовать descriptive test names
 - Документировать flaky tests если найдены
+
+### Test Timing Constraints
+
+| Тип теста | Max время | Всего тестов |
+|-----------|-----------|--------------|
+| Unit | < 100ms | < 10s общее |
+| Integration | < 1s | < 60s общее |
+| E2E | < 30s | < 5 min общее |
+
+### Naming Conventions (Python)
+
+```python
+# ПРАВИЛЬНО: описывает что тестируется и ожидаемый результат
+def test_validate_email_returns_false_for_empty_string():
+def test_user_registration_sends_welcome_email():
+def test_api_returns_404_for_unknown_user():
+
+# НЕПРАВИЛЬНО: не ясно что тестируется
+def test_email():
+def test_user():
+def test_1():
+```
+
+### When to Write Each Test Type
+
+| Когда | Тип теста | Пример |
+|-------|-----------|--------|
+| TDD (перед кодом) | Unit | Пишем тесты на функцию до реализации |
+| После компонента | Integration | Проверяем что части работают вместе |
+| После фичи | E2E | Полный user flow через API/UI |

@@ -114,6 +114,100 @@ rg "innerHTML|dangerouslySetInnerHTML|v-html" --type js --type ts --type vue
 | MEDIUM | Code smell, maintainability | Fix recommended |
 | LOW | Nitpick, style preference | Optional improvement |
 
+## Example Findings
+
+### CRITICAL — SQL Injection
+
+**File:** `db/queries.py:42`
+```python
+# Уязвимый код
+query = f"SELECT * FROM users WHERE id = {user_id}"
+cursor.execute(query)
+
+# Исправление
+cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+```
+**Risk:** Атакующий может выполнить произвольный SQL
+**Action:** REJECT — исправить до merge
+
+### CRITICAL — Hardcoded Secret
+
+**File:** `config.py:15`
+```python
+# Уязвимый код
+API_KEY = "sk-1234567890abcdef"
+
+# Исправление
+API_KEY = os.environ.get("API_KEY")
+```
+**Risk:** Утечка credentials в git history
+**Action:** REJECT — удалить секрет, ротировать ключ
+
+### HIGH — Missing Error Handling
+
+**File:** `api/users.py:78`
+```python
+# Проблемный код
+def get_user(user_id: int):
+    return db.query(User).filter_by(id=user_id).first()
+    # Что если user не найден? Вернётся None
+
+# Исправление
+def get_user(user_id: int) -> User:
+    user = db.query(User).filter_by(id=user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+```
+**Risk:** NoneType error в вызывающем коде
+**Action:** CHANGES REQUESTED
+
+### HIGH — Missing Tests
+
+**File:** `services/payment.py` (новый файл, 150 строк)
+```
+Добавлен новый сервис для обработки платежей.
+Тесты отсутствуют.
+```
+**Risk:** Критическая функциональность без тестового покрытия
+**Action:** CHANGES REQUESTED — добавить тесты перед merge
+
+### MEDIUM — Duplicate Code
+
+**File:** `utils/validators.py:20-35` и `api/forms.py:45-60`
+```python
+# Одинаковая логика валидации email в двух местах
+# Рекомендация: вынести в общую функцию
+```
+**Risk:** Несогласованность при изменениях
+**Action:** Рекомендуется рефакторинг
+
+### LOW — Naming Suggestion
+
+**File:** `models/user.py:12`
+```python
+# Текущее
+def proc(self, data):
+    ...
+
+# Рекомендуется
+def process_user_data(self, data):
+    ...
+```
+**Risk:** Снижение читаемости
+**Action:** Optional improvement
+
+## Context-Aware Review
+
+Применяй разные критерии в зависимости от типа изменений:
+
+| Тип коммита | Что проверять особенно |
+|-------------|------------------------|
+| feat | Тесты есть, документация есть, breaking changes описаны |
+| fix | Regression test добавлен, scope минимален |
+| refactor | Поведение не изменилось, тесты проходят |
+| test | Тесты meaningful, не overfitted |
+
 ## Output Format
 
 ```markdown
