@@ -1,8 +1,58 @@
 {
   "project": "Claude-Code-Kit",
   "description": "Template/toolkit for Claude Code workflows with agents, commands, and workspace structure",
-  "lastUpdated": "2025-12-04T23:30:00Z",
-  "features": [],
+  "lastUpdated": "2025-12-06T12:00:00Z",
+  "features": [
+    {
+      "id": "F001",
+      "name": "Критические исправления (Фаза 1)",
+      "status": "done",
+      "priority": "1",
+      "description": "plan.md Write, fix-issue/status YAML, security-agent замена"
+    },
+    {
+      "id": "F002",
+      "name": "Документация docs/ (Фаза 2)",
+      "status": "done",
+      "priority": "2",
+      "description": "README, WORKFLOW, COMMANDS, AGENTS"
+    },
+    {
+      "id": "F003",
+      "name": "Переработка агентов (Фаза 3)",
+      "status": "done",
+      "priority": "1",
+      "description": "6 агентов, doc-agent 30→320 строк"
+    },
+    {
+      "id": "F004",
+      "name": "Переработка команд (Фаза 4)",
+      "status": "done",
+      "priority": "1",
+      "description": "8 команд, Context Discovery, Python примеры"
+    },
+    {
+      "id": "F005",
+      "name": "Workspace tracking (Фаза 5)",
+      "status": "done",
+      "priority": "2",
+      "description": "progress.md, features.json, decisions.md, current-task.md"
+    },
+    {
+      "id": "F006",
+      "name": "Конфигурация и безопасность (Фаза 6)",
+      "status": "pending",
+      "priority": "3",
+      "description": "settings.local.json permissions, hooks"
+    },
+    {
+      "id": "F007",
+      "name": "Обновление CLAUDE.md (Фаза 7)",
+      "status": "pending",
+      "priority": "2",
+      "description": "Синхронизация с реальной структурой"
+    }
+  ],
   "statusLegend": {
     "pending": "Not started",
     "planned": "Plan created, not implemented",
