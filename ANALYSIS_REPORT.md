@@ -413,9 +413,7 @@ description: Senior architect for planning. MUST BE USED PROACTIVELY before impl
 │   ├── status.md          # Добавить compact mode + frontmatter
 │   ├── fix-issue.md       # Добавить validation + frontmatter
 │   └── quick-fix.md       # НОВЫЙ: Fast bug fixes
-├── settings.json          # НОВЫЙ: Hooks configuration
-└── hooks/                 # НОВЫЙ: Hook scripts
-    └── validate-bash.sh
+└── settings.local.json    # НОВЫЙ: Hooks configuration (inline hooks)
 ```
 
 ### 5.2 Обновлённые агенты
@@ -635,7 +633,7 @@ allowed-tools: Read, Edit, Bash, Grep
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/validate-bash.sh"
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // empty'); if echo \"$CMD\" | grep -qE '(rm -rf /|rm -rf ~|rm -rf \\*|> /dev/sd)'; then echo 'BLOCKED: Dangerous command' >&2; exit 2; fi; exit 0"
           }
         ]
       }
@@ -662,41 +660,6 @@ allowed-tools: Read, Edit, Bash, Grep
     ]
   }
 }
-```
-
-#### `.claude/hooks/validate-bash.sh`
-```bash
-#!/bin/bash
-# Валидация Bash команд перед выполнением
-
-DANGEROUS_PATTERNS=(
-  "rm -rf /"
-  "rm -rf ~"
-  "rm -rf \*"
-  "sudo rm"
-  "> /dev/sd"
-  "mkfs"
-  "dd if="
-  ":(){:|:&};:"
-)
-
-INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qF "$pattern"; then
-    echo "BLOCKED: Dangerous command pattern detected: $pattern" >&2
-    exit 2  # Exit code 2 blocks the tool
-  fi
-done
-
-# Check for .env access
-if echo "$COMMAND" | grep -qE '(cat|less|more|head|tail|vim|nano|code).*\.env'; then
-  echo "BLOCKED: Direct .env file access not allowed" >&2
-  exit 2
-fi
-
-exit 0
 ```
 
 ---
@@ -886,9 +849,7 @@ model: sonnet
 │   ├── status.md          # Статус проекта
 │   ├── fix-issue.md       # Исправление GitHub issue
 │   └── quick-fix.md       # Быстрые исправления
-├── settings.json          # Hooks configuration
-└── hooks/
-    └── validate-bash.sh   # Security validation
+└── settings.local.json    # Hooks configuration (inline)
 
 .claude-workspace/
 ├── progress.md            # Лог прогресса

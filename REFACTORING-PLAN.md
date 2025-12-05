@@ -231,12 +231,6 @@
   - [ ] Опасные команды блокированы
   - [ ] Hooks настроены правильно
 
-- [ ] **6.2 validate-bash.sh**
-  - [ ] Security patterns полные
-  - [ ] Fork bomb detection работает
-  - [ ] Dangerous patterns caught
-  - [ ] Network commands warnings
-
 ---
 
 ## Фаза 7: Документация

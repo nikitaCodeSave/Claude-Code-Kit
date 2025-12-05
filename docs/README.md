@@ -63,9 +63,7 @@ claude
 │   │   ├── quick-fix.md        # Быстрые исправления
 │   │   ├── status.md           # Статус проекта
 │   │   └── fix-issue.md        # Исправление GitHub issues
-│   ├── hooks/                  # Shell hooks
-│   │   └── validate-bash.sh    # Валидация опасных команд
-│   └── settings.local.json     # Локальные настройки
+│   └── settings.local.json     # Локальные настройки (включает inline hooks)
 │
 ├── .claude-workspace/          # Рабочие файлы отслеживания
 │   ├── progress.md             # Лог прогресса сессий

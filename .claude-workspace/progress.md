@@ -70,7 +70,7 @@
 - [x] Set up slash commands (plan, implement, review, test, quick-fix, init-project, status)
 - [x] Added agents (lead, code, review, test, explore, doc)
 - [x] Created CLAUDE.md with project overview
-- [x] Added hooks (validate-bash.sh)
+- [x] Added security hooks in settings.local.json
 
 ### Commits
 - `bbfa649` - chore: initialize Claude Code workspace
