@@ -41,14 +41,14 @@
     {
       "id": "F006",
       "name": "Конфигурация и безопасность (Фаза 6)",
-      "status": "pending",
+      "status": "done",
       "priority": "3",
       "description": "settings.local.json permissions, hooks"
     },
     {
       "id": "F007",
       "name": "Обновление CLAUDE.md (Фаза 7)",
-      "status": "pending",
+      "status": "done",
       "priority": "2",
       "description": "Синхронизация с реальной структурой"
     }
