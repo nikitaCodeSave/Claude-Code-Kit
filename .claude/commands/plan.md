@@ -1,6 +1,6 @@
 ---
 description: Creates detailed implementation plan for a feature or task. Use when user mentions "plan", "design", "architect", or before implementing any feature > 50 lines of code.
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 # Plan Feature/Task: $ARGUMENTS
 

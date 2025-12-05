@@ -1,22 +1,3 @@
-# Project Status
-
-Покажи текущий статус проекта.
-
-## Gather Information
-
-```bash
-# 1. Текущая задача
-cat .claude-workspace/current-task.md 2>/dev/null || echo "No current task"
-
-# 2. Прогресс
-cat .claude-workspace/progress.md 2>/dev/null | tail -50
-
-# 3. Фичи
-cat .claude-workspace/features.json 2>/dev/null || echo "No features file"
-
-# 4. Git status
-git status --short
-git log --oneline -5
 ---
 description: Shows current project status. Use for quick overview, when user asks "what's next", "where are we", or "status". Supports compact mode.
 allowed-tools: Read, Bash, Grep, Glob
@@ -57,13 +38,13 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 ### If COMPACT mode (`$ARGUMENTS` contains "compact" or "short"):
 
 ```markdown
-## 📊 Status (compact)
+## Status (compact)
 
 **Task:** [task name or "None"]
 **Progress:** [X/Y steps]
 **Branch:** `[branch]`
 **Changes:** [uncommitted count or "clean"]
-**Tests:** ✅/❌
+**Tests:** OK/FAIL
 
 **Next:** [recommended action]
 ```
@@ -71,13 +52,13 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 ### If FULL mode (default):
 
 ```markdown
-## 📊 Project Status
+## Project Status
 
 **Generated:** [timestamp]
 
 ---
 
-### 🎯 Current Task
+### Current Task
 [Из current-task.md или "No active task"]
 
 **Progress:** [X/Y steps completed]
@@ -85,22 +66,22 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 
 ---
 
-### 📝 Recent Activity
+### Recent Activity
 [Последние 5 записей из progress.md]
 
 ---
 
-### 📦 Features Overview
+### Features Overview
 
 | Status | Feature |
 |--------|---------|
-| ✅ Done | feature1 |
-| 🔄 In Progress | feature2 |
-| ⏳ Planned | feature3 |
+| Done | feature1 |
+| In Progress | feature2 |
+| Planned | feature3 |
 
 ---
 
-### 🔀 Git Status
+### Git Status
 
 **Branch:** `[current branch]`
 
@@ -114,7 +95,7 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 
 ---
 
-### 🧪 Tests
+### Tests
 ```
 [test output summary]
 ```
@@ -124,12 +105,12 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 
 ---
 
-### ⚠️ Warnings
+### Warnings
 [Any blockers, issues, or concerns]
 
 ---
 
-### 📌 Recommended Next Steps
+### Recommended Next Steps
 
 1. **[Most important action]**
    - Command: `/project:xxx`
@@ -153,76 +134,5 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 
 Заверши сообщением:
 ```
-💡 Suggested: [команда] — [почему]
+Suggested: [команда] — [почему]
 ```
-# 5. Тесты (quick check)
-npm run test 2>/dev/null || pytest --collect-only 2>/dev/null || echo "Tests not configured"
-```
-
-## Output Format
-
-```markdown
-## 📊 Project Status
-
-**Generated:** [timestamp]
-
----
-
-### 🎯 Current Task
-[Из current-task.md или "No active task"]
-
-**Progress:** [X/Y steps completed]
-
----
-
-### 📝 Recent Activity
-[Последние 5 записей из progress.md]
-
----
-
-### 📦 Features Overview
-
-| Status | Count | Features |
-|--------|-------|----------|
-| ✅ Done | X | feature1, feature2 |
-| 🔄 In Progress | Y | feature3 |
-| ⏳ Pending | Z | feature4, feature5 |
-
----
-
-### 🔀 Git Status
-
-**Branch:** `[current branch]`
-**Uncommitted changes:** [yes/no - list files if yes]
-
-**Recent commits:**
-1. [hash] [message] - [time ago]
-2. ...
-
----
-
-### 🧪 Tests
-- Total: X
-- Passing: Y
-- Failing: Z
-
----
-
-### ⚠️ Warnings/Issues
-- [Any blockers or issues]
-
----
-
-### 📌 Recommended Next Steps
-
-1. [Most important next action]
-2. [Second priority]
-3. [Third priority]
-```
-
-## Quick Actions
-После показа статуса, предложи:
-- `/project:plan [feature]` - если нет текущей задачи
-- `/project:implement` - если есть план
-- `/project:review` - если есть незакоммиченные изменения
-- `/project:test [feature]` - если нужно тестирование

@@ -125,8 +125,8 @@ find . -type f -name "*.ts" -o -name "*.py" -o -name "*.go" | head -30 | xargs d
 
 Используй subagents для:
 - **explore-agent**: Когда нужно быстро найти что-то в codebase
-- **security-agent**: Для security-sensitive изменений
 - **test-agent**: Для определения test strategy
+- **review-agent**: Для проверки безопасности и security-sensitive изменений
 
 ## Constraints
 
