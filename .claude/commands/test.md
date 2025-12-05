@@ -1,5 +1,5 @@
 ---
-description: End-to-end testing of a feature. Use after implementation to verify feature works as real user would expect. Supports both automated and manual testing flows.
+description: E2E тестирование фичи. Использовать после реализации для проверки работы как реальный пользователь. Поддерживает автоматическое и ручное тестирование.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 # Test Feature: $ARGUMENTS
@@ -243,8 +243,8 @@ pytest --cov=src --cov-report=term-missing
 
 ### Next Steps
 
-- [ ] Fix failing tests → `/project:implement`
-- [ ] Code review → `/project:review`
+- [ ] Fix failing tests → `/implement`
+- [ ] Code review → `/review`
 - [ ] Or mark as done
 ```
 
@@ -289,3 +289,15 @@ fi
 - Документируй **ВСЕ** найденные проблемы
 - Screenshots помогают понять visual bugs
 - Flaky tests требуют особого внимания
+
+## Update Progress
+
+После завершения тестирования добавь запись в `.claude-workspace/progress.md`:
+
+```bash
+echo "## $(date '+%Y-%m-%d %H:%M') - Testing: $ARGUMENTS" >> .claude-workspace/progress.md
+echo "- Feature: $ARGUMENTS" >> .claude-workspace/progress.md
+echo "- Status: [PASS/FAIL/PARTIAL]" >> .claude-workspace/progress.md
+echo "- Bugs found: [количество или 'none']" >> .claude-workspace/progress.md
+echo "" >> .claude-workspace/progress.md
+```

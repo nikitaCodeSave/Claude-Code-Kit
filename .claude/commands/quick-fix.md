@@ -1,5 +1,5 @@
 ---
-description: Quick bug fix without full planning cycle. Use for small, obvious fixes < 20 lines of code. NOT for new features or refactoring.
+description: Быстрое исправление бага без полного цикла планирования. Только для мелких очевидных фиксов < 20 строк. НЕ для новых фич или рефакторинга.
 allowed-tools: Read, Edit, Bash, Grep, Glob
 ---
 # Quick Fix: $ARGUMENTS
@@ -145,7 +145,19 @@ git commit -m "fix($SCOPE): $ARGUMENTS
 
 **Reason:** [почему]
 
-**Recommendation:** Run `/project:plan $ARGUMENTS` for proper planning.
+**Recommendation:** Run `/plan $ARGUMENTS` for proper planning.
 ```
 
 И останови работу.
+
+## Update Progress
+
+После завершения quick fix добавь запись в `.claude-workspace/progress.md`:
+
+```bash
+echo "## $(date '+%Y-%m-%d %H:%M') - Quick Fix: $ARGUMENTS" >> .claude-workspace/progress.md
+echo "- Bug: $ARGUMENTS" >> .claude-workspace/progress.md
+echo "- Files changed: [список файлов]" >> .claude-workspace/progress.md
+echo "- Commit: [hash]" >> .claude-workspace/progress.md
+echo "" >> .claude-workspace/progress.md
+```

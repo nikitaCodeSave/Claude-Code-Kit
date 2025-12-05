@@ -1,5 +1,5 @@
 ---
-description: Shows current project status. Use for quick overview, when user asks "what's next", "where are we", or "status". Supports compact mode.
+description: Показывает текущий статус проекта. Использовать для быстрого обзора, при вопросах "что дальше", "где мы", или "status". Поддерживает компактный режим.
 allowed-tools: Read, Bash, Grep, Glob
 ---
 # Project Status
@@ -32,6 +32,17 @@ timeout 10 pytest --co -q 2>/dev/null | tail -5 || echo "Tests: unknown"
 | features.json | Показать "No features tracked" |
 | current-task.md | Показать "No active task" |
 | progress.md | Показать "No history" |
+
+**ВАЖНО:** Если директория `.claude-workspace/` НЕ существует:
+
+```markdown
+⚠️ Workspace не инициализирован
+
+Запустите `/init-project` для инициализации:
+- Создаст структуру .claude-workspace/
+- Настроит файлы отслеживания
+- Проверит конфигурацию проекта
+```
 
 ## Gather Information
 
@@ -134,7 +145,7 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 ### Recommended Next Steps
 
 1. **[Most important action]**
-   - Command: `/project:xxx`
+   - Command: `/xxx`
 2. [Second priority]
 3. [Third priority]
 ```
@@ -145,10 +156,11 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 
 | Ситуация | Рекомендация |
 |----------|--------------|
-| Нет текущей задачи | `/project:plan [feature]` |
-| Есть план, не начат | `/project:implement` |
-| Есть изменения, готово | `/project:review` |
-| Есть failed tests | `/project:test [feature]` |
+| Workspace не создан | `/init-project` |
+| Нет текущей задачи | `/plan [feature]` |
+| Есть план, не начат | `/implement` |
+| Есть изменения, готово | `/review` |
+| Есть failed tests | `/test [feature]` |
 | Есть uncommitted | `git add . && git commit` |
 
 ## Constraints

@@ -1,5 +1,5 @@
 ---
-description: Creates detailed implementation plan for a feature or task. Use when user mentions "plan", "design", "architect", or before implementing any feature > 50 lines of code.
+description: Создаёт детальный план реализации фичи или задачи. Использовать при упоминании "plan", "design", "architect", или перед реализацией фич > 50 строк кода.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 # Plan Feature/Task: $ARGUMENTS
@@ -123,6 +123,33 @@ echo "- Status: Plan created" >> .claude-workspace/progress.md
 echo "" >> .claude-workspace/progress.md
 
 # Если новая фича - добавь в features.json
+```
+
+### 5. Document Architecture Decisions (если применимо)
+
+Если при планировании был выбран один подход из нескольких возможных,
+добавь запись в `.claude-workspace/decisions.md`:
+
+```markdown
+## ADR-NNN: [Название решения]
+
+**Date:** $(date '+%Y-%m-%d')
+**Status:** Accepted
+**Context:** $ARGUMENTS
+
+### Context
+[Почему возникла необходимость выбора]
+
+### Decision
+[Что было выбрано и почему]
+
+### Alternatives Considered
+- [Вариант A] — [почему отклонён]
+- [Вариант B] — [почему отклонён]
+
+### Consequences
+- [Положительные последствия]
+- [Риски или компромиссы]
 ```
 
 ## Constraints

@@ -9,7 +9,7 @@
 ```mermaid
 flowchart TB
     subgraph User["👤 Пользователь"]
-        CMD[Команды /project:*]
+        CMD[Команды /*]
         CHAT[Свободный чат]
     end
 
@@ -80,13 +80,13 @@ sequenceDiagram
     participant G as 📂 Git
 
     Note over U,G: Фаза 1: Инициализация (один раз)
-    U->>C: /project:init-project
+    U->>C: /init-project
     C->>C: Создать .claude-workspace/
     C->>G: git status
     C-->>U: ✅ Workspace готов
 
     Note over U,G: Фаза 2: Планирование
-    U->>C: /project:plan добавить авторизацию
+    U->>C: /plan добавить авторизацию
     C->>L: Делегировать планирование
     L->>E: Исследовать codebase
     E->>E: Glob, Grep, Read
@@ -96,7 +96,7 @@ sequenceDiagram
     C-->>U: 📋 План готов. Approve?
 
     Note over U,G: Фаза 3: Имплементация
-    U->>C: /project:implement
+    U->>C: /implement
     C->>CO: Делегировать реализацию
     
     loop Для каждого шага плана
@@ -113,7 +113,7 @@ sequenceDiagram
     C-->>U: ✅ Код готов
 
     Note over U,G: Фаза 4: Тестирование
-    U->>C: /project:test авторизация
+    U->>C: /test авторизация
     C->>T: Делегировать тестирование
     T->>T: Unit tests
     T->>T: Integration tests
@@ -123,7 +123,7 @@ sequenceDiagram
     C-->>U: 📊 Тесты: 95% pass, 87% coverage
 
     Note over U,G: Фаза 5: Code Review
-    U->>C: /project:review
+    U->>C: /review
     C->>R: Делегировать review
     R->>R: git diff analysis
     R->>R: Security scan
@@ -143,11 +143,11 @@ sequenceDiagram
 flowchart TD
     START([🚀 Новая фича]) --> INIT{Workspace<br/>инициализирован?}
     
-    INIT -->|Нет| INIT_CMD[/project:init-project]
+    INIT -->|Нет| INIT_CMD[/init-project]
     INIT_CMD --> PLAN
     INIT -->|Да| PLAN
     
-    PLAN[/project:plan feature/] --> THINK[Lead Agent:<br/>Think Hard]
+    PLAN[/plan feature/] --> THINK[Lead Agent:<br/>Think Hard]
     THINK --> EXPLORE[Explore Agent:<br/>Исследование codebase]
     EXPLORE --> CREATE_PLAN[Создать план<br/>в current-task.md]
     CREATE_PLAN --> APPROVE{User:<br/>Approve план?}
@@ -155,7 +155,7 @@ flowchart TD
     APPROVE -->|Нет| REVISE[Уточнить требования]
     REVISE --> THINK
     
-    APPROVE -->|Да| IMPLEMENT[/project:implement/]
+    APPROVE -->|Да| IMPLEMENT[/implement/]
     
     IMPLEMENT --> STEP_LOOP{Есть ещё<br/>шаги?}
     
@@ -166,14 +166,14 @@ flowchart TD
     COMMIT --> UPDATE_PROGRESS[Update progress.md]
     UPDATE_PROGRESS --> STEP_LOOP
     
-    STEP_LOOP -->|Нет| TEST[/project:test feature/]
+    STEP_LOOP -->|Нет| TEST[/test feature/]
     
     TEST --> TEST_RESULT{Тесты<br/>проходят?}
     
     TEST_RESULT -->|Нет| FIX_BUGS[Исправить баги]
     FIX_BUGS --> TEST
     
-    TEST_RESULT -->|Да| REVIEW[/project:review/]
+    TEST_RESULT -->|Да| REVIEW[/review/]
     
     REVIEW --> REVIEW_RESULT{Review<br/>пройден?}
     
@@ -205,7 +205,7 @@ sequenceDiagram
     participant CO as 💻 Code Agent
     participant G as 📂 Git
 
-    U->>C: /project:fix-issue 123
+    U->>C: /fix-issue 123
     
     C->>GH: gh issue view 123
     GH-->>C: Issue details
@@ -259,7 +259,7 @@ flowchart TD
     
     RUN_TEST_FAIL --> COMPLEXITY{Fix сложный<br/>> 20 LOC?}
     
-    COMPLEXITY -->|Да| ESCALATE[/project:plan fix/]
+    COMPLEXITY -->|Да| ESCALATE[/plan fix/]
     ESCALATE --> END_PLAN([Создать план])
     
     COMPLEXITY -->|Нет| FIX[Исправить код]
@@ -290,7 +290,7 @@ flowchart TD
 flowchart TD
     START([🔧 Quick Fix]) --> ASSESS{Изменения<br/>< 20 LOC?}
     
-    ASSESS -->|Нет| ESCALATE[/project:plan/]
+    ASSESS -->|Нет| ESCALATE[/plan/]
     ESCALATE --> END_PLAN([Полный цикл])
     
     ASSESS -->|Да| TYPE{Тип<br/>изменения?}
@@ -319,7 +319,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    START([/project:status/]) --> MODE{Аргументы?}
+    START([/status/]) --> MODE{Аргументы?}
     
     MODE -->|compact| COMPACT[Краткий отчёт]
     MODE -->|default| FULL[Полный отчёт]
@@ -359,7 +359,7 @@ sequenceDiagram
     participant R as 👀 Review Agent
     participant G as 📂 Git
 
-    U->>C: /project:review [scope]
+    U->>C: /review [scope]
     
     Note over C: scope: N commits | staged | branch | all
     
@@ -396,7 +396,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    START([/project:test feature/]) --> SETUP[Setup test environment]
+    START([/test feature/]) --> SETUP[Setup test environment]
     
     SETUP --> START_SERVER{Dev server<br/>needed?}
     START_SERVER -->|Да| RUN_SERVER[npm run dev]
@@ -455,12 +455,12 @@ flowchart TD
 stateDiagram-v2
     [*] --> Backlog: Новая задача
     
-    Backlog --> Planning: /project:plan
+    Backlog --> Planning: /plan
     
     Planning --> Planned: План готов
     Planning --> Backlog: Отменено
     
-    Planned --> InProgress: /project:implement
+    Planned --> InProgress: /implement
     Planned --> Planning: Требует доработки
     
     InProgress --> Testing: Код готов
@@ -504,23 +504,23 @@ flowchart TD
     START([🤔 Что делать?]) --> TYPE{Тип задачи?}
     
     TYPE -->|Новая фича| SIZE{Размер?}
-    SIZE -->|Большая| PLAN[/project:plan/]
-    SIZE -->|Маленькая| QUICK_PLAN[/project:plan/ краткий]
+    SIZE -->|Большая| PLAN[/plan/]
+    SIZE -->|Маленькая| QUICK_PLAN[/plan/ краткий]
     
     TYPE -->|Баг| BUG_SIZE{Размер фикса?}
-    BUG_SIZE -->|< 20 LOC| QUICK[/project:quick-fix/]
+    BUG_SIZE -->|< 20 LOC| QUICK[/quick-fix/]
     BUG_SIZE -->|> 20 LOC| PLAN
     
-    TYPE -->|GitHub Issue| ISSUE[/project:fix-issue N/]
+    TYPE -->|GitHub Issue| ISSUE[/fix-issue N/]
     
     TYPE -->|Проверка| CHECK{Что проверить?}
-    CHECK -->|Статус| STATUS[/project:status/]
-    CHECK -->|Тесты| TEST[/project:test/]
-    CHECK -->|Код| REVIEW[/project:review/]
+    CHECK -->|Статус| STATUS[/status/]
+    CHECK -->|Тесты| TEST[/test/]
+    CHECK -->|Код| REVIEW[/review/]
     
     TYPE -->|Исследование| EXPLORE_Q[Задать вопрос в чате<br/>→ Explore Agent]
     
-    PLAN --> IMPLEMENT[/project:implement/]
+    PLAN --> IMPLEMENT[/implement/]
     QUICK_PLAN --> IMPLEMENT
     
     IMPLEMENT --> TEST

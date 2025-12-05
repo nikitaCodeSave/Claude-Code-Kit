@@ -1,6 +1,6 @@
 ---
 name: lead-agent
-description: Senior software architect for planning and task decomposition. MUST BE USED PROACTIVELY before implementing any feature > 50 LOC. Triggers on "plan", "think hard", "think harder", "ultrathink", "design", "architect", or any architectural discussion.
+description: Старший архитектор для планирования и декомпозиции задач. Использовать ПРОАКТИВНО перед реализацией фич > 50 строк. Триггеры: "plan", "think hard", "ultrathink", "design", "architect".
 tools: Read, Grep, Glob, Bash(git:*, find, cat, head, jq, ls)
 model: sonnet
 ---

@@ -1,5 +1,5 @@
 ---
-description: Initializes project workspace for Claude Code. Creates tracking files, workspace structure, and validates configuration. Run once at project start.
+description: Инициализация workspace проекта для Claude Code. Создаёт файлы отслеживания, структуру workspace и валидирует конфигурацию. Запускать один раз в начале проекта.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 # Initialize Project for Claude Code
@@ -80,19 +80,19 @@ mkdir -p .claude/hooks
 ```markdown
 # Progress Log
 
-## How to Use
-- Add entry at START of each session with task
-- Add entry at END of each session with results
-- Keep last 20 sessions, archive older
+## Как использовать
+- Добавляй запись в НАЧАЛЕ сессии с планируемой задачей
+- Добавляй запись в КОНЦЕ сессии с результатами
+- Храни последние 20 сессий, старые архивируй
 
 ---
 
 ## Session: [YYYY-MM-DD HH:MM]
-**Task:** Project initialization
+**Task:** Инициализация проекта
 **Completed:**
-- Created .claude-workspace structure
-- Initialized tracking files
-**Notes:** Ready for development
+- Создана структура .claude-workspace
+- Инициализированы файлы отслеживания
+**Notes:** Готов к разработке
 
 ---
 ```
@@ -112,28 +112,28 @@ mkdir -p .claude/hooks
 
 No active task.
 
-Use `/project:plan [feature]` to start planning a new feature.
+Use `/plan [feature]` to start planning a new feature.
 ```
 
 #### .claude-workspace/decisions.md
 ```markdown
 # Architectural Decisions
 
-## How to Use
-Document important decisions with:
-- **Context:** Why was this decision needed?
-- **Decision:** What was decided?
-- **Consequences:** What are the implications?
+## Как использовать
+Документируй важные решения:
+- **Контекст:** Почему возникла необходимость решения?
+- **Решение:** Что было выбрано и почему?
+- **Последствия:** Какие последствия?
 
 ---
 
-## [DATE] - Project Initialization
+## [DATE] - Инициализация проекта
 
-**Context:** Setting up Claude Code workflow for this project.
+**Контекст:** Настройка Claude Code workflow для проекта.
 
-**Decision:** Using standard .claude-workspace structure with TDD workflow.
+**Решение:** Использование стандартной структуры .claude-workspace с TDD workflow.
 
-**Consequences:** All team members will follow consistent development process.
+**Последствия:** Вся команда будет следовать консистентному процессу разработки.
 
 ---
 ```
@@ -245,11 +245,11 @@ fi
 ### 🚀 Next Steps
 
 1. Review and customize `CLAUDE.md` for your project
-2. Run `/project:status` to see current state
-3. Run `/project:plan [first feature]` to start development
+2. Run `/status` to see current state
+3. Run `/plan [first feature]` to start development
 
 ### 💡 Recommended Commands
-- `/project:status` — check project state
-- `/project:plan [feature]` — plan a new feature
-- `/project:quick-fix [bug]` — fix small bugs
+- `/status` — check project state
+- `/plan [feature]` — plan a new feature
+- `/quick-fix [bug]` — fix small bugs
 ```

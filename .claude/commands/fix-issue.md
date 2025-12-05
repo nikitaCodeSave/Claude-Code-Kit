@@ -1,5 +1,5 @@
 ---
-description: Analyze and fix a GitHub issue by number. Use when user mentions issue number or wants to fix a specific GitHub issue. Follows TDD approach.
+description: Анализ и исправление GitHub issue по номеру. Использовать при упоминании номера issue или запросе исправить конкретный issue. Следует TDD подходу.
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 # Fix GitHub Issue: $ARGUMENTS
@@ -220,6 +220,31 @@ echo "- Issue: $ISSUE_TITLE" >> .claude-workspace/progress.md
 echo "- PR: [link]" >> .claude-workspace/progress.md
 echo "- Status: Ready for review" >> .claude-workspace/progress.md
 echo "" >> .claude-workspace/progress.md
+```
+
+### 9. Document Decisions (для сложных фиксов)
+
+Если при исправлении issue было принято архитектурное решение
+(выбор подхода, изменение структуры, workaround), добавь в `.claude-workspace/decisions.md`:
+
+```markdown
+## ADR-NNN: Fix for Issue #$ARGUMENTS
+
+**Date:** $(date '+%Y-%m-%d')
+**Status:** Accepted
+**Context:** GitHub Issue #$ARGUMENTS - [краткое описание]
+
+### Problem
+[Описание проблемы из issue]
+
+### Solution Chosen
+[Выбранный подход к исправлению]
+
+### Alternatives Considered
+- [Другой подход] — [почему отклонён]
+
+### Trade-offs
+- [Компромиссы принятого решения]
 ```
 
 ## Output Format

@@ -1,5 +1,5 @@
 ---
-description: Independent code review of recent changes. Use after implementation completion, before merge. Provides objective quality assessment with fresh perspective.
+description: Независимый код-ревью недавних изменений. Использовать после завершения реализации, перед merge. Объективная оценка качества свежим взглядом.
 allowed-tools: Read, Grep, Glob, Bash
 ---
 # Review Recent Changes

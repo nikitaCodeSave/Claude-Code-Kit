@@ -1,6 +1,6 @@
 ---
 name: review-agent
-description: Independent code reviewer. MUST BE USED after implementation completion, before merge. Provides objective quality assessment with fresh perspective. Use when user says "review", "check code", or after code-agent finishes.
+description: Независимый код-ревьюер. Использовать после завершения реализации, перед merge. Объективная оценка качества свежим взглядом. Триггеры: "review", "check code".
 tools: Read, Grep, Glob, Bash(git:diff,git:log,git:show,git:status,npm:run:lint,npm:run:test,ruff,eslint)
 model: sonnet
 ---

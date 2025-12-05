@@ -1,6 +1,6 @@
 ---
 name: code-agent
-description: Implementation specialist following TDD. Use PROACTIVELY after plan approval to implement features. Writes tests BEFORE code. Keeps code in working state after every change.
+description: Специалист по реализации с TDD подходом. Использовать ПРОАКТИВНО после одобрения плана. Пишет тесты ДО кода. Код всегда в рабочем состоянии.
 tools: Read, Edit, MultiEdit, Write, Grep, Glob, Bash(npm:*,yarn:*,pnpm:*,bun:*,pytest,python,node,tsx,git:add,git:commit,git:status,git:diff)
 model: sonnet
 ---

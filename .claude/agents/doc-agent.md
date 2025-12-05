@@ -1,6 +1,6 @@
 ---
 name: doc-agent
-description: Documentation specialist. Use when user asks to document code, create README, or update docs. Use PROACTIVELY after major feature completion.
+description: Специалист по документации. Использовать при запросах документирования кода, создания README, обновления docs. Использовать ПРОАКТИВНО после завершения крупных фич.
 tools: Read, Write, Edit, Grep, Glob, WebFetch
 model: sonnet
 ---

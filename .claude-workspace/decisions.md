@@ -1,32 +1,39 @@
 # Architectural Decisions Record (ADR)
 
-## Purpose
-Document important architectural and design decisions.
-This helps future sessions understand WHY certain choices were made.
+## Назначение
+Документирование важных архитектурных и дизайн-решений.
+Помогает будущим сессиям понять ПОЧЕМУ были сделаны определённые выборы.
 
-## Template
+## Как использовать
+Документируй важные решения по шаблону:
+- **Контекст:** Почему возникла необходимость решения?
+- **Решение:** Что было выбрано и почему?
+- **Альтернативы:** Какие варианты рассматривались?
+- **Последствия:** Что станет проще или сложнее?
+
+## Шаблон
 ```markdown
-## [DATE] - Decision Title
+## [ДАТА] - Название решения
 
-### Status
-[Proposed | Accepted | Deprecated | Superseded by ADR-XXX]
+### Статус
+[Предложено | Принято | Устарело | Заменено ADR-XXX]
 
-### Context
-What is the issue that we're seeing that is motivating this decision?
+### Контекст
+Какая проблема мотивирует это решение?
 
-### Decision
-What is the change that we're proposing and/or doing?
+### Решение
+Какое изменение предлагается/делается?
 
-### Alternatives Considered
-1. Alternative 1 - why rejected
-2. Alternative 2 - why rejected
+### Рассмотренные альтернативы
+1. Альтернатива 1 — почему отклонена
+2. Альтернатива 2 — почему отклонена
 
-### Consequences
-What becomes easier or more difficult because of this decision?
+### Последствия
+Что станет проще или сложнее из-за этого решения?
 
-### References
-- Link to related issue/PR
-- Link to documentation
+### Ссылки
+- Ссылка на issue/PR
+- Ссылка на документацию
 ```
 
 ---

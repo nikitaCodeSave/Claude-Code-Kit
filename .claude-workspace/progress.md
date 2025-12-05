@@ -1,10 +1,10 @@
 # Progress Log
 
-## How to Use
-- Add entry at START of each session with planned task
-- Add entry at END of each session with results  
-- This is your memory between context windows
-- Keep last 20 sessions, archive older ones
+## Как использовать
+- Добавляй запись в НАЧАЛЕ сессии с планируемой задачей
+- Добавляй запись в КОНЦЕ сессии с результатами
+- Это твоя память между контекстными окнами
+- Храни последние 20 сессий, старые архивируй
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Implements current task from .claude-workspace/current-task.md using strict TDD. Use after plan is approved and ready for coding.
+description: Реализует текущую задачу из .claude-workspace/current-task.md через строгий TDD. Использовать после одобрения плана.
 allowed-tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob
 ---
 # Implement Current Task
