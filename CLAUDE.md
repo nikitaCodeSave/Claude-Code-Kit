@@ -60,3 +60,21 @@ Claude Code Kit — шаблонный проект со структурой, �
 Формат: `type(scope): description`
 
 Типы: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`
+
+## Безопасность
+
+### Автоматически разрешено
+- Git: add, commit, checkout, pull, stash, rm
+- Python: все команды
+- Docker: stop, rm
+
+### Требует подтверждения
+- SSH подключения
+- Docker exec/run
+
+### Заблокировано (PreToolUse hook)
+- rm -rf /, ~, *, .
+- git reset --hard, push --force, clean -fd
+- curl/wget | sh
+- chmod 000/777
+- mkfs, dd of=/dev

@@ -713,82 +713,7 @@ tree -L 2 -I 'node_modules|__pycache__|.git' | head -50
 - Максимум 20 результатов
 ```
 
-### 6.2 Security Agent (Аудит безопасности)
-
-```markdown
----
-name: security-agent
-description: Security audit specialist. MUST BE USED before production deployments and after implementing authentication, authorization, or data handling code.
-tools: Read, Grep, Glob
-model: opus
----
-
-Вы — специалист по безопасности приложений.
-Ваша задача — найти уязвимости и compliance проблемы.
-
-## Audit Scope
-1. **Secrets Detection**
-   ```bash
-   rg -i "(api[_-]?key|password|secret|token|credential)" --type-add 'config:*.{yml,yaml,json,env,toml}' -t config
-   rg "-----BEGIN (RSA |EC |DSA )?PRIVATE KEY-----"
-   ```
-
-2. **Injection Vulnerabilities**
-   ```bash
-   rg "(execute|query|raw).*\+" --type py --type js  # SQL injection
-   rg "(exec|system|eval|spawn)\s*\(" --type js --type py  # Command injection
-   rg "innerHTML|dangerouslySetInnerHTML" --type js --type ts  # XSS
-   ```
-
-3. **Authentication/Authorization**
-   - Отсутствующие auth checks
-   - Hardcoded credentials
-   - Weak session management
-
-4. **Input Validation**
-   - Missing sanitization
-   - File upload без валидации
-   - Rate limiting отсутствует
-
-## Finding Severity
-| Level | Description | Action |
-|-------|-------------|--------|
-| CRITICAL | Data breach risk | BLOCK deployment |
-| HIGH | Security vulnerability | Fix before merge |
-| MEDIUM | Best practice violation | Fix recommended |
-| LOW | Minor improvement | Optional |
-
-## Output Format
-```markdown
-## Security Audit Report
-
-**Date:** [timestamp]
-**Scope:** [files/directories audited]
-
-### Critical Findings
-1. **[Title]**
-   - File: `path:line`
-   - Issue: [description]
-   - Remediation: [how to fix]
-   - CWE: [reference]
-
-### Summary
-- Critical: N
-- High: N
-- Medium: N
-- Low: N
-
-### Recommendations
-1. [Priority action]
-```
-
-## Constraints
-- НИКОГДА не выполняй exploits
-- НЕ модифицируй файлы
-- НЕ логируй найденные secrets
-```
-
-### 6.3 Doc Agent (Документация)
+### 6.2 Doc Agent (Документация)
 
 ```markdown
 ---
@@ -864,15 +789,15 @@ model: sonnet
 
 ```
 .claude/agents/
-├── security-agent.md      # Security audits (opus)
 ├── doc-agent.md           # Documentation (sonnet)
 └── perf-agent.md          # Performance analysis (sonnet)
 
 .claude/commands/
-├── security-audit.md      # Запуск security audit
 ├── generate-docs.md       # Генерация документации
 └── analyze-perf.md        # Анализ производительности
 ```
+
+> **Примечание:** Security checks интегрированы в review-agent (см. ADR-005)
 
 ---
 
@@ -892,9 +817,8 @@ model: sonnet
    - Улучшить tool scoping для безопасности
 
 3. **ЖЕЛАТЕЛЬНО (когда будет время)**:
-   - Добавить security-agent для аудитов
-   - Добавить doc-agent для документации
    - Интегрировать с Puppeteer MCP для E2E
+   - Добавить perf-agent для анализа производительности
 
 ### Ключевые метрики успеха
 
