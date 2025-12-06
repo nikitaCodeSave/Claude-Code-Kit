@@ -8,7 +8,7 @@
       "name": "Критические исправления (Фаза 1)",
       "status": "done",
       "priority": "1",
-      "description": "plan.md Write, fix-issue/status YAML, security-agent замена"
+      "description": "plan.md Write, fix-issue/project-status YAML, security-agent замена"
     },
     {
       "id": "F002",

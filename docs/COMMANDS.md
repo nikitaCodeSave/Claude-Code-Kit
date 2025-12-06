@@ -12,7 +12,7 @@
 | `/review` | Код-ревью | После реализации |
 | `/test [feature]` | Тестирование | После реализации |
 | `/quick-fix [bug]` | Быстрый fix | Для мелких багов < 20 LOC |
-| `/status` | Статус проекта | В любое время |
+| `/project-status` | Статус проекта | В любое время |
 | `/fix-issue [#N]` | Fix GitHub issue | Когда есть issue |
 
 ---
@@ -59,7 +59,7 @@
 
 ### Связанные
 
-- После: `/status`, `/plan`
+- После: `/project-status`, `/plan`
 
 ---
 
@@ -416,9 +416,9 @@ Email regex не принимал домены с цифрами.
 
 ---
 
-## /status
+## /project-status
 
-**Файл:** `.claude/commands/status.md`
+**Файл:** `.claude/commands/project-status.md`
 
 ### Описание
 
@@ -433,7 +433,7 @@ Email regex не принимал домены с цифрами.
 ### Аргументы
 
 ```
-/status [mode]
+/project-status [mode]
 ```
 
 Варианты mode:
@@ -467,10 +467,10 @@ Email regex не принимал домены с цифрами.
 ### Пример использования
 
 ```
-/status
+/project-status
 
 # или
-/status compact
+/project-status compact
 ```
 
 ### Связанные

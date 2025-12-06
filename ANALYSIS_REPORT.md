@@ -225,7 +225,7 @@ model: sonnet  # inherit если нужна consistency с main
 | `/implement` | Нет интеграции с hooks | Добавить auto-format после каждого шага |
 | `/review` | Hardcoded количество коммитов | Сделать умный default |
 | `/test` | Нет поддержки coverage | Добавить coverage отчёты |
-| `/status` | Слишком verbose | Добавить compact mode |
+| `/project-status` | Слишком verbose | Добавить compact mode |
 | `/fix-issue` | Нет валидации номера issue | Добавить проверку существования |
 
 ### 3.2 Отсутствует YAML Frontmatter
@@ -265,7 +265,7 @@ description: Implements current task from .claude-workspace/current-task.md usin
 ---
 ```
 
-#### `/project:status`
+#### `/project-status`
 ```markdown
 # ДОБАВИТЬ COMPACT MODE
 ---
@@ -410,7 +410,7 @@ description: Senior architect for planning. MUST BE USED PROACTIVELY before impl
 │   ├── implement.md       # Добавить frontmatter
 │   ├── test.md            # Добавить frontmatter + coverage
 │   ├── review.md          # Добавить smart defaults + frontmatter
-│   ├── status.md          # Добавить compact mode + frontmatter
+│   ├── project-status.md  # Добавить compact mode + frontmatter
 │   ├── fix-issue.md       # Добавить validation + frontmatter
 │   └── quick-fix.md       # НОВЫЙ: Fast bug fixes
 └── settings.local.json    # НОВЫЙ: Hooks configuration (inline hooks)
@@ -771,7 +771,7 @@ model: sonnet
 │   ├── implement.md       # Реализация по плану
 │   ├── test.md            # E2E тестирование
 │   ├── review.md          # Code review
-│   ├── status.md          # Статус проекта
+│   ├── project-status.md  # Статус проекта
 │   ├── fix-issue.md       # Исправление GitHub issue
 │   └── quick-fix.md       # Быстрые исправления
 └── settings.local.json    # Hooks configuration (inline)

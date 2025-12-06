@@ -36,7 +36,7 @@ claude
 
 ```bash
 # Проверьте статус
-/status
+/project-status
 
 # Запланируйте первую фичу
 /plan my-first-feature
@@ -61,7 +61,7 @@ claude
 │   │   ├── review.md           # Код-ревью
 │   │   ├── test.md             # Тестирование
 │   │   ├── quick-fix.md        # Быстрые исправления
-│   │   ├── status.md           # Статус проекта
+│   │   ├── project-status.md   # Статус проекта
 │   │   └── fix-issue.md        # Исправление GitHub issues
 │   └── settings.local.json     # Локальные настройки (включает inline hooks)
 │
@@ -109,7 +109,7 @@ claude
 | Команда | Описание |
 |---------|----------|
 | `/init-project` | Инициализировать проект |
-| `/status` | Показать текущий статус проекта |
+| `/project-status` | Показать текущий статус проекта |
 | `/plan [feature]` | Создать план реализации фичи |
 | `/implement` | Реализовать текущую задачу |
 | `/review` | Провести код-ревью |

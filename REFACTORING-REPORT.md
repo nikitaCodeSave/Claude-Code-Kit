@@ -83,7 +83,7 @@
 | review.md | 241 | 282 | +41 |
 | init-project.md | 211 | 254 | +43 |
 | implement.md | 122 | 183 | +61 |
-| status.md | 139 | 171 | +32 |
+| project-status.md | 139 | 171 | +32 |
 | plan.md | 107 | 160 | +53 |
 | quick-fix.md | 112 | 150 | +38 |
 | **Итого** | **1409** | **1822** | **+413** |

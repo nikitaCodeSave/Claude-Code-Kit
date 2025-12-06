@@ -319,7 +319,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    START([/status/]) --> MODE{Аргументы?}
+    START([/project-status/]) --> MODE{Аргументы?}
     
     MODE -->|compact| COMPACT[Краткий отчёт]
     MODE -->|default| FULL[Полный отчёт]
@@ -514,7 +514,7 @@ flowchart TD
     TYPE -->|GitHub Issue| ISSUE[/fix-issue N/]
     
     TYPE -->|Проверка| CHECK{Что проверить?}
-    CHECK -->|Статус| STATUS[/status/]
+    CHECK -->|Статус| STATUS[/project-status/]
     CHECK -->|Тесты| TEST[/test/]
     CHECK -->|Код| REVIEW[/review/]
     

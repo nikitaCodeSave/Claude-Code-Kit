@@ -243,11 +243,11 @@ fi
 ### 🚀 Next Steps
 
 1. Review and customize `CLAUDE.md` for your project
-2. Run `/status` to see current state
+2. Run `/project-status` to see current state
 3. Run `/plan [first feature]` to start development
 
 ### 💡 Recommended Commands
-- `/status` — check project state
+- `/project-status` — check project state
 - `/plan [feature]` — plan a new feature
 - `/quick-fix [bug]` — fix small bugs
 ```
