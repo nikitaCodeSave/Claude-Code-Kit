@@ -178,7 +178,7 @@ pytest --cov=src --cov-report=term-missing 2>/dev/null | tail -20
 ### Git Log
 [последние N коммитов]
 
-### Next Steps
-- [ ] Run /review for code review
-- [ ] Or continue with next task
+### Следующие шаги
+- [ ] Запусти /review для код-ревью
+- [ ] Или продолжи со следующей задачей
 ```

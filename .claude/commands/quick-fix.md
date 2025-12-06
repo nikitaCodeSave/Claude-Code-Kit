@@ -2,14 +2,14 @@
 description: Быстрое исправление бага без полного цикла планирования. Только для мелких очевидных фиксов < 20 строк. НЕ для новых фич или рефакторинга.
 allowed-tools: Read, Edit, Bash, Grep, Glob
 ---
-# Quick Fix: $ARGUMENTS
+# Быстрое исправление: $ARGUMENTS
 
 > `$ARGUMENTS` — описание бага после команды
 > Пример: `/quick-fix login fails with spaces` → $ARGUMENTS = "login fails with spaces"
 
 Быстрое исправление небольшого бага БЕЗ полного цикла планирования.
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА:
 
@@ -24,7 +24,7 @@ git diff --stat HEAD~3 2>/dev/null | head -10
 cat pyproject.toml 2>/dev/null | head -10 || cat package.json 2>/dev/null | head -10
 ```
 
-## Quick Fix Criteria
+## Критерии быстрого исправления
 
 | Критерий | Quick Fix | Нужен /plan |
 |----------|-----------|-------------|
@@ -36,7 +36,7 @@ cat pyproject.toml 2>/dev/null | head -10 || cat package.json 2>/dev/null | head
 
 Если сложнее → используй `/plan`
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Рефакторинг "заодно"
@@ -49,9 +49,9 @@ cat pyproject.toml 2>/dev/null | head -10 || cat package.json 2>/dev/null | head
 - Минимальные изменения
 - Коммит сразу после фикса
 
-## Process
+## Процесс
 
-### 1. Find the Problem
+### 1. Найти проблему
 
 ```bash
 # Поиск по описанию бага
@@ -61,14 +61,14 @@ rg "$ARGUMENTS" --type-add 'code:*.{ts,js,py,go}' -t code -C 2 | head -30
 rg "error|Error|ERROR" --type-add 'code:*.{ts,js,py}' -t code | grep -i "$ARGUMENTS" | head -10
 ```
 
-### 2. Read and Understand
+### 2. Прочитать и понять
 
 ```bash
 # Прочитай файл с проблемой
 # [use Read tool on identified file]
 ```
 
-### 3. Write Test First
+### 3. Сначала написать тест
 
 ```python
 # Напиши тест воспроизводящий баг в tests/test_*.py
@@ -83,13 +83,13 @@ def test_bug_description():
 pytest tests/test_module.py::test_bug_description -v
 ```
 
-### 4. Fix Minimally
+### 4. Минимальное исправление
 
 - Внеси минимальные изменения
 - Только то что нужно для fix
 - НЕ рефактори "заодно"
 
-### 5. Verify
+### 5. Проверить
 
 ```bash
 # Тест теперь проходит
@@ -105,7 +105,7 @@ ruff check src/
 ruff check . --fix
 ```
 
-### 6. Commit
+### 6. Закоммитить
 
 ```bash
 git add .
@@ -115,42 +115,42 @@ git commit -m "fix($SCOPE): $ARGUMENTS
 - Added test for regression"
 ```
 
-## Output Format
+## Формат вывода
 
 ```markdown
-## Quick Fix Complete: $ARGUMENTS
+## Быстрое исправление завершено: $ARGUMENTS
 
-### Problem
+### Проблема
 [Что было сломано — 1-2 предложения]
 
-### Solution
+### Решение
 [Что исправили — 1-2 предложения]
 
-### Changes
-- `src/module.py:42` — [description]
+### Изменения
+- `src/module.py:42` — [описание]
 
-### Test Added
-- `tests/test_module.py::test_bug_description` — ensures bug doesn't regress
+### Добавленный тест
+- `tests/test_module.py::test_bug_description` — защита от регрессии бага
 
-### Commit
+### Коммит
 `abc1234` fix(scope): $ARGUMENTS
 ```
 
-## If Fix is Not Quick
+## Если исправление не быстрое
 
 Если в процессе понял что fix сложнее:
 
 ```markdown
-⚠️ This fix is more complex than expected.
+⚠️ Это исправление сложнее чем ожидалось.
 
-**Reason:** [почему]
+**Причина:** [почему]
 
-**Recommendation:** Run `/plan $ARGUMENTS` for proper planning.
+**Рекомендация:** Запусти `/plan $ARGUMENTS` для полноценного планирования.
 ```
 
 И останови работу.
 
-## Update Progress
+## Обновление прогресса
 
 После завершения quick fix добавь запись в `.claude-workspace/progress.md`:
 

@@ -2,7 +2,7 @@
 description: Показывает текущий статус проекта. Использовать для быстрого обзора, при вопросах "что дальше", "где мы", или "status". Поддерживает компактный режим.
 allowed-tools: Read, Bash, Grep, Glob
 ---
-# Project Status
+# Статус проекта
 
 > `$ARGUMENTS`:
 > - `compact` или `short` — краткий вывод
@@ -10,7 +10,7 @@ allowed-tools: Read, Bash, Grep, Glob
 
 Покажи текущий статус проекта.
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА (с timeout для безопасности):
 
@@ -25,7 +25,7 @@ timeout 5 git status --short 2>/dev/null | head -10
 timeout 10 pytest --co -q 2>/dev/null | tail -5 || echo "Tests: unknown"
 ```
 
-## Missing Files Handling
+## Обработка отсутствующих файлов
 
 | Файл | Если отсутствует |
 |------|------------------|
@@ -44,7 +44,7 @@ timeout 10 pytest --co -q 2>/dev/null | tail -5 || echo "Tests: unknown"
 - Проверит конфигурацию проекта
 ```
 
-## Gather Information
+## Сбор информации
 
 ```bash
 # 1. Текущая задача
@@ -65,92 +65,92 @@ TEST_RESULT=$(timeout 30 pytest --co -q 2>&1 | tail -5 || echo "Tests not config
 FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] | "\(.status): \(.name)"' 2>/dev/null) || FEATURES="No features tracked"
 ```
 
-## Output Format
+## Формат вывода
 
-### If COMPACT mode (`$ARGUMENTS` contains "compact" or "short"):
+### Если КОМПАКТНЫЙ режим (`$ARGUMENTS` содержит "compact" или "short"):
 
 ```markdown
-## Status (compact)
+## Статус (компактный)
 
-**Task:** [task name or "None"]
-**Progress:** [X/Y steps]
-**Branch:** `[branch]`
-**Changes:** [uncommitted count or "clean"]
-**Tests:** OK/FAIL
+**Задача:** [название задачи или "Нет"]
+**Прогресс:** [X/Y шагов]
+**Ветка:** `[branch]`
+**Изменения:** [количество незакоммиченных или "чисто"]
+**Тесты:** OK/FAIL
 
-**Next:** [recommended action]
+**Далее:** [рекомендуемое действие]
 ```
 
-### If FULL mode (default):
+### Если ПОЛНЫЙ режим (по умолчанию):
 
 ```markdown
-## Project Status
+## Статус проекта
 
-**Generated:** [timestamp]
-
----
-
-### Current Task
-[Из current-task.md или "No active task"]
-
-**Progress:** [X/Y steps completed]
-**Next Step:** [следующий незавершённый шаг]
+**Сгенерировано:** [timestamp]
 
 ---
 
-### Recent Activity
+### Текущая задача
+[Из current-task.md или "Нет активной задачи"]
+
+**Прогресс:** [X/Y шагов выполнено]
+**Следующий шаг:** [следующий незавершённый шаг]
+
+---
+
+### Недавняя активность
 [Последние 5 записей из progress.md]
 
 ---
 
-### Features Overview
+### Обзор фич
 
-| Status | Feature |
-|--------|---------|
-| Done | feature1 |
-| In Progress | feature2 |
-| Planned | feature3 |
+| Статус | Фича |
+|--------|------|
+| Готово | feature1 |
+| В работе | feature2 |
+| Запланировано | feature3 |
 
 ---
 
-### Git Status
+### Статус Git
 
-**Branch:** `[current branch]`
+**Ветка:** `[текущая ветка]`
 
-**Uncommitted Changes:**
-[список файлов или "Working tree clean"]
+**Незакоммиченные изменения:**
+[список файлов или "Рабочее дерево чистое"]
 
-**Recent Commits:**
-1. `abc123` feat: description — 2h ago
-2. `def456` fix: description — 5h ago
+**Недавние коммиты:**
+1. `abc123` feat: описание — 2ч назад
+2. `def456` fix: описание — 5ч назад
 ...
 
 ---
 
-### Tests
+### Тесты
 ```
-[test output summary]
+[резюме вывода тестов]
 ```
-- Passing: X
-- Failing: Y
-- Coverage: Z% (if available)
+- Прошло: X
+- Упало: Y
+- Покрытие: Z% (если доступно)
 
 ---
 
-### Warnings
-[Any blockers, issues, or concerns]
+### Предупреждения
+[Блокеры, проблемы или замечания]
 
 ---
 
-### Recommended Next Steps
+### Рекомендуемые следующие шаги
 
-1. **[Most important action]**
-   - Command: `/xxx`
-2. [Second priority]
-3. [Third priority]
+1. **[Самое важное действие]**
+   - Команда: `/xxx`
+2. [Второй приоритет]
+3. [Третий приоритет]
 ```
 
-## Quick Actions
+## Быстрые действия
 
 После показа статуса, предложи релевантные команды:
 
@@ -163,7 +163,7 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 | Есть failed tests | `/test [feature]` |
 | Есть uncommitted | `git add . && git commit` |
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Модифицировать файлы (read-only команда!)
@@ -175,9 +175,9 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 - Graceful handling если файлы отсутствуют
 - Показать конкретный next step
 
-## Output
+## Вывод
 
 Заверши сообщением:
 ```
-Suggested: [команда] — [почему]
+Рекомендуется: [команда] — [почему]
 ```

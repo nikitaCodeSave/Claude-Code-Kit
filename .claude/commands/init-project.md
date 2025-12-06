@@ -2,11 +2,11 @@
 description: Инициализация workspace проекта для Claude Code. Создаёт файлы отслеживания, структуру workspace и валидирует конфигурацию. Запускать один раз в начале проекта.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
-# Initialize Project for Claude Code
+# Инициализация проекта для Claude Code
 
 Инициализируй проект для эффективной работы с Claude Code.
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА проверь что уже существует:
 
@@ -24,7 +24,7 @@ cat CLAUDE.md 2>/dev/null | head -20 && echo "CLAUDE.md exists!"
 git status --short 2>/dev/null || echo "Not a git repo"
 ```
 
-## Pre-existing Files Check
+## Проверка существующих файлов
 
 | Файл | Если существует |
 |------|-----------------|
@@ -33,9 +33,9 @@ git status --short 2>/dev/null || echo "Not a git repo"
 | .gitignore | Append только новые строки |
 | .claude/ | Оставить как есть |
 
-## Process
+## Процесс
 
-### 1. Analyze Project
+### 1. Анализ проекта
 
 ```bash
 # Определи тип проекта
@@ -46,9 +46,9 @@ ls -la
 if [ -f "package.json" ]; then
   echo "Node.js project detected"
   cat package.json | jq '.name, .scripts'
-elif [ -f "pyproject.toml" ]; then
+elif [ -f "requirements.txt" ]; then
   echo "Python project detected"
-  cat pyproject.toml | head -20
+  cat requirements.txt | head -20
 elif [ -f "Cargo.toml" ]; then
   echo "Rust project detected"
 elif [ -f "go.mod" ]; then
@@ -64,7 +64,7 @@ if [ -d ".claude" ]; then
 fi
 ```
 
-### 2. Create Workspace Structure
+### 2. Создание структуры workspace
 
 ```bash
 # Create directories
@@ -73,11 +73,11 @@ mkdir -p .claude/commands
 mkdir -p .claude/agents
 ```
 
-### 3. Create Tracking Files
+### 3. Создание файлов отслеживания
 
 #### .claude-workspace/progress.md
 ```markdown
-# Progress Log
+# Лог прогресса
 
 ## Как использовать
 - Добавляй запись в НАЧАЛЕ сессии с планируемой задачей
@@ -107,16 +107,16 @@ mkdir -p .claude/agents
 
 #### .claude-workspace/current-task.md
 ```markdown
-# Current Task
+# Текущая задача
 
-No active task.
+Нет активной задачи.
 
-Use `/plan [feature]` to start planning a new feature.
+Используй `/plan [feature]` чтобы начать планирование новой фичи.
 ```
 
 #### .claude-workspace/decisions.md
 ```markdown
-# Architectural Decisions
+# Архитектурные решения
 
 ## Как использовать
 Документируй важные решения:
@@ -137,32 +137,32 @@ Use `/plan [feature]` to start planning a new feature.
 ---
 ```
 
-### 4. Create/Update CLAUDE.md
+### 4. Создание/Обновление CLAUDE.md
 
-If CLAUDE.md doesn't exist, create basic one:
+Если CLAUDE.md не существует, создай базовый:
 
 ```markdown
-# Project: [NAME]
+# Проект: [NAME]
 
-## Tech Stack
-- [detected tech stack]
+## Технологический стек
+- [определённый tech stack]
 
-## Commands
-- `npm run dev` — start dev server
-- `npm test` — run tests
-- `npm run lint` — run linter
+## Команды
+- `npm run dev` — запуск dev сервера
+- `npm test` — запуск тестов
+- `npm run lint` — запуск линтера
 
-## Code Style
-- [auto-detect from config files]
+## Стиль кода
+- [автоопределение из конфиг файлов]
 
-## Architecture
-- [brief description]
+## Архитектура
+- [краткое описание]
 
-## Important Notes
-- [any critical info]
+## Важные заметки
+- [критичная информация]
 ```
 
-### 5. Validate Settings
+### 5. Валидация настроек
 
 ```bash
 # Check for hooks configuration
@@ -176,7 +176,7 @@ if [ -z "$(ls -A .claude/agents/ 2>/dev/null)" ]; then
 fi
 ```
 
-### 6. Git Setup (Idempotent)
+### 6. Настройка Git (идемпотентно)
 
 ```bash
 # Add to .gitignore if needed (idempotent - проверяем перед добавлением)
@@ -192,7 +192,7 @@ else
 fi
 ```
 
-## Error Handling
+## Обработка ошибок
 
 | Ошибка | Действие |
 |--------|----------|
@@ -201,7 +201,7 @@ fi
 | Git not initialized | Предложить `git init` |
 | Files modified | Предупредить о перезаписи |
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Перезаписывать существующие файлы без спроса
@@ -213,12 +213,12 @@ fi
 - Использовать idempotent команды
 - Спрашивать при конфликтах
 
-## Output
+## Вывод
 
 ```markdown
-## ✅ Project Initialized for Claude Code
+## ✅ Проект инициализирован для Claude Code
 
-### Created Structure
+### Созданная структура
 ```
 .claude-workspace/
 ├── progress.md      ✅
@@ -233,21 +233,21 @@ fi
 ```
 
 ### CLAUDE.md
-[Created/Updated/Already exists and valid]
+[Создан/Обновлён/Уже существует и валиден]
 
 ### Git
-[Initial commit created / Already tracked]
+[Начальный коммит создан / Уже отслеживается]
 
 ---
 
-### 🚀 Next Steps
+### 🚀 Следующие шаги
 
-1. Review and customize `CLAUDE.md` for your project
-2. Run `/project-status` to see current state
-3. Run `/plan [first feature]` to start development
+1. Проверь и настрой `CLAUDE.md` под свой проект
+2. Запусти `/project-status` чтобы увидеть текущее состояние
+3. Запусти `/plan [первая фича]` чтобы начать разработку
 
-### 💡 Recommended Commands
-- `/project-status` — check project state
-- `/plan [feature]` — plan a new feature
-- `/quick-fix [bug]` — fix small bugs
+### 💡 Рекомендуемые команды
+- `/project-status` — проверить состояние проекта
+- `/plan [feature]` — спланировать новую фичу
+- `/quick-fix [bug]` — исправить мелкие баги
 ```

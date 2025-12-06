@@ -2,14 +2,14 @@
 description: Анализ и исправление GitHub issue по номеру. Использовать при упоминании номера issue или запросе исправить конкретный issue. Следует TDD подходу.
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
-# Fix GitHub Issue: $ARGUMENTS
+# Исправление GitHub Issue: $ARGUMENTS
 
 > `$ARGUMENTS` — номер issue
 > Пример: `/fix-issue 123` → $ARGUMENTS = "123"
 
 Проанализируй и исправь GitHub issue #$ARGUMENTS.
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА:
 
@@ -27,7 +27,7 @@ git status --short 2>/dev/null
 git branch --show-current 2>/dev/null
 ```
 
-## Pre-Requisites
+## Предварительные требования
 
 ```bash
 # 1. Проверь что gh CLI установлен и авторизован
@@ -52,9 +52,9 @@ if ! [[ "$ARGUMENTS" =~ ^[0-9]+$ ]]; then
 fi
 ```
 
-## Process
+## Процесс
 
-### 1. Get Issue Details
+### 1. Получить детали Issue
 
 ```bash
 # Получи детали issue
@@ -70,7 +70,7 @@ echo "Title: $ISSUE_TITLE"
 echo "Labels: $ISSUE_LABELS"
 ```
 
-### 2. Investigate the Problem
+### 2. Исследовать проблему
 
 ```bash
 # Поиск в codebase по ключевым словам из issue
@@ -83,7 +83,7 @@ gh pr list --search "issue:$ARGUMENTS"
 # [after identifying files]
 ```
 
-### 3. Reproduce Locally (если возможно)
+### 3. Воспроизвести локально (если возможно)
 
 ```bash
 # Запусти dev server
@@ -97,7 +97,7 @@ sleep 5
 rg "error message from issue" --type-add 'code:*.{ts,js,py}' -t code
 ```
 
-### 4. Plan the Fix
+### 4. Спланировать исправление
 
 Используй **"think hard"** чтобы понять:
 - Почему проблема возникает?
@@ -108,26 +108,26 @@ rg "error message from issue" --type-add 'code:*.{ts,js,py}' -t code
 Запиши план в `.claude-workspace/current-task.md`:
 
 ```markdown
-## Fix: Issue #$ARGUMENTS - [Title]
+## Исправление: Issue #$ARGUMENTS - [Заголовок]
 
-### Problem Analysis
+### Анализ проблемы
 [Описание проблемы и root cause]
 
-### Solution Approach
+### Подход к решению
 [Описание решения]
 
-### Files to Change
-- `path/to/file.ts` — [what to change]
+### Файлы для изменения
+- `path/to/file.ts` — [что изменить]
 
-### Test Strategy
-- [ ] Add test reproducing the bug
-- [ ] Verify fix doesn't break existing tests
+### Стратегия тестирования
+- [ ] Добавить тест воспроизводящий баг
+- [ ] Проверить что фикс не ломает существующие тесты
 
-### Risks
-- [Potential side effects]
+### Риски
+- [Потенциальные побочные эффекты]
 ```
 
-### 5. Implement Fix (TDD)
+### 5. Реализовать исправление (TDD)
 
 ```bash
 # 1. Создай ветку
@@ -159,7 +159,7 @@ pytest tests/test_issue_$ARGUMENTS.py -v
 pytest tests/ -v
 ```
 
-### 6. Verify
+### 6. Проверить
 
 ```bash
 # Все тесты проходят
@@ -175,7 +175,7 @@ mypy src/ 2>/dev/null || echo "mypy not configured"
 # [manual verification if needed]
 ```
 
-### 7. Commit and PR
+### 7. Коммит и PR
 
 ```bash
 # Коммит с ссылкой на issue
@@ -211,7 +211,7 @@ Fixes #$ARGUMENTS
   --assignee @me
 ```
 
-### 8. Update Tracking
+### 8. Обновить отслеживание
 
 ```bash
 # Обнови progress.md
@@ -222,106 +222,106 @@ echo "- Status: Ready for review" >> .claude-workspace/progress.md
 echo "" >> .claude-workspace/progress.md
 ```
 
-### 9. Document Decisions (для сложных фиксов)
+### 9. Документировать решения (для сложных фиксов)
 
 Если при исправлении issue было принято архитектурное решение
 (выбор подхода, изменение структуры, workaround), добавь в `.claude-workspace/decisions.md`:
 
 ```markdown
-## ADR-NNN: Fix for Issue #$ARGUMENTS
+## ADR-NNN: Исправление Issue #$ARGUMENTS
 
-**Date:** $(date '+%Y-%m-%d')
-**Status:** Accepted
-**Context:** GitHub Issue #$ARGUMENTS - [краткое описание]
+**Дата:** $(date '+%Y-%m-%d')
+**Статус:** Принято
+**Контекст:** GitHub Issue #$ARGUMENTS - [краткое описание]
 
-### Problem
+### Проблема
 [Описание проблемы из issue]
 
-### Solution Chosen
+### Выбранное решение
 [Выбранный подход к исправлению]
 
-### Alternatives Considered
+### Рассмотренные альтернативы
 - [Другой подход] — [почему отклонён]
 
-### Trade-offs
+### Компромиссы
 - [Компромиссы принятого решения]
 ```
 
-## Output Format
+## Формат вывода
 
 ```markdown
-## Issue #$ARGUMENTS Fixed
+## Issue #$ARGUMENTS исправлен
 
 ### Issue
-**Title:** [title]
-**Labels:** [labels]
+**Заголовок:** [заголовок]
+**Метки:** [метки]
 
-### Root Cause
-[1-2 sentences explaining why the bug occurred]
+### Корневая причина
+[1-2 предложения объясняющих почему возник баг]
 
-### Solution
-[1-2 sentences explaining the fix]
+### Решение
+[1-2 предложения объясняющих исправление]
 
-### Changes Made
-| File | Change |
-|------|--------|
-| `path/file.ts` | [description] |
-| `path/test.ts` | Added regression test |
+### Внесённые изменения
+| Файл | Изменение |
+|------|-----------|
+| `path/file.ts` | [описание] |
+| `path/test.ts` | Добавлен тест на регрессию |
 
-### Tests
-- New test: `test_issue_$ARGUMENTS_regression`
-- All existing tests pass
-- Coverage: X% (no decrease)
+### Тесты
+- Новый тест: `test_issue_$ARGUMENTS_regression`
+- Все существующие тесты проходят
+- Покрытие: X% (без снижения)
 
 ### PR
-**Branch:** `fix/issue-$ARGUMENTS`
-**PR:** [link to PR]
+**Ветка:** `fix/issue-$ARGUMENTS`
+**PR:** [ссылка на PR]
 
-### Verification
-- [x] Bug no longer reproduces
-- [x] All tests pass
-- [x] No regressions
-- [x] Linting/types OK
+### Верификация
+- [x] Баг больше не воспроизводится
+- [x] Все тесты проходят
+- [x] Нет регрессий
+- [x] Линтинг/типы OK
 
-### Next Steps
-- [ ] Wait for PR review
-- [ ] Address review comments if any
-- [ ] Merge after approval
+### Следующие шаги
+- [ ] Дождаться ревью PR
+- [ ] Исправить замечания ревьюера (если будут)
+- [ ] Смержить после одобрения
 ```
 
-## Error Handling
+## Обработка ошибок
 
-### Issue Not Found
+### Issue не найден
 ```markdown
-Issue #$ARGUMENTS not found
+Issue #$ARGUMENTS не найден
 
-Possible reasons:
-- Issue number is incorrect
-- Issue is in a different repository
-- You don't have access to this issue
+Возможные причины:
+- Номер issue неверен
+- Issue в другом репозитории
+- Нет доступа к этому issue
 
-Run `gh issue list` to see available issues.
+Запусти `gh issue list` чтобы увидеть доступные issues.
 ```
 
-### Cannot Reproduce
+### Не удаётся воспроизвести
 ```markdown
-Cannot reproduce issue #$ARGUMENTS locally
+Не удаётся воспроизвести issue #$ARGUMENTS локально
 
-**What I tried:**
-- [Steps attempted]
+**Что пробовал:**
+- [Предпринятые шаги]
 
-**Possible reasons:**
-- Environment-specific issue
-- Missing data/configuration
-- Already fixed in current code
+**Возможные причины:**
+- Проблема специфична для окружения
+- Недостающие данные/конфигурация
+- Уже исправлено в текущем коде
 
-**Recommendations:**
-1. Ask for more details in the issue
-2. Check if issue is still relevant
-3. Try on different environment
+**Рекомендации:**
+1. Запросить больше деталей в issue
+2. Проверить актуальность issue
+3. Попробовать в другом окружении
 ```
 
-## Extended Error Handling
+## Расширенная обработка ошибок
 
 | Ситуация | Действие |
 |----------|----------|
@@ -332,7 +332,7 @@ Cannot reproduce issue #$ARGUMENTS locally
 | No permissions to repo | Предложить fork |
 | Cannot reproduce | Запросить больше информации |
 
-## Keyword Extraction Examples
+## Примеры извлечения ключевых слов
 
 ```bash
 # Из title: "Login fails with special characters"
@@ -343,7 +343,7 @@ rg "special.*character|character.*special" --type py -C 2
 rg "auth|authenticate" --type py -l
 ```
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Push без тестов

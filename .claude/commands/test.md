@@ -2,14 +2,14 @@
 description: E2E тестирование фичи. Использовать после реализации для проверки работы как реальный пользователь. Поддерживает автоматическое и ручное тестирование.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
-# Test Feature: $ARGUMENTS
+# Тестирование фичи: $ARGUMENTS
 
 > `$ARGUMENTS` — название фичи для тестирования
 > Пример: `/test user login` → $ARGUMENTS = "user login"
 
 Протестируй фичу "$ARGUMENTS" end-to-end как реальный пользователь.
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА:
 
@@ -27,7 +27,7 @@ cat pytest.ini 2>/dev/null || cat pyproject.toml 2>/dev/null | grep -A 10 "\[too
 rg "$ARGUMENTS" tests/ 2>/dev/null | head -10
 ```
 
-## Pre-Test Setup
+## Подготовка к тестированию
 
 ```bash
 # 1. Проверь что dev server можно запустить (если FastAPI/Flask)
@@ -48,9 +48,9 @@ cat pyproject.toml 2>/dev/null | grep -A 5 "pytest\|unittest"
 rg "def test.*$ARGUMENTS" tests/ 2>/dev/null | head -10
 ```
 
-## Testing Process
+## Процесс тестирования
 
-### 1. Unit/Integration Tests
+### 1. Unit/Integration тесты
 
 ```bash
 # Запусти тесты для конкретной фичи
@@ -88,9 +88,9 @@ async def test_async_feature():
     assert result is not None
 ```
 
-### 2. E2E Testing
+### 2. E2E тестирование
 
-#### С Browser Automation (Playwright/Puppeteer MCP)
+#### С автоматизацией браузера (Playwright/Puppeteer MCP)
 
 ```bash
 # Запусти Playwright тесты
@@ -104,7 +104,7 @@ npx playwright test --grep "$ARGUMENTS"
 # 5. Проверь результаты визуально
 ```
 
-#### Без Browser Automation (API Testing)
+#### Без автоматизации браузера (API тестирование)
 
 ```bash
 # Health check
@@ -122,22 +122,22 @@ curl -s -X POST http://localhost:3000/api/[endpoint] \
 curl -s -w "\nStatus: %{http_code}\n" http://localhost:3000/api/notfound
 ```
 
-### 3. Test Scenarios Matrix
+### 3. Матрица тестовых сценариев
 
 Для фичи "$ARGUMENTS" проверь:
 
-| # | Scenario | Input | Expected | Status |
-|---|----------|-------|----------|--------|
-| 1 | Happy Path | valid data | success | ⬜ |
-| 2 | Empty Input | `""`, `null` | validation error | ⬜ |
-| 3 | Invalid Input | wrong type/format | type error | ⬜ |
-| 4 | Boundary Min | minimum valid | success/error | ⬜ |
-| 5 | Boundary Max | maximum valid | success/error | ⬜ |
-| 6 | Special Chars | `<script>`, `'; DROP` | sanitized | ⬜ |
-| 7 | Concurrent | parallel requests | no race condition | ⬜ |
-| 8 | Network Error | timeout/500 | graceful handling | ⬜ |
+| # | Сценарий | Входные данные | Ожидаемый результат | Статус |
+|---|----------|----------------|---------------------|--------|
+| 1 | Основной путь | валидные данные | успех | ⬜ |
+| 2 | Пустой ввод | `""`, `null` | ошибка валидации | ⬜ |
+| 3 | Невалидный ввод | неверный тип/формат | ошибка типа | ⬜ |
+| 4 | Граница мин | минимально допустимое | успех/ошибка | ⬜ |
+| 5 | Граница макс | максимально допустимое | успех/ошибка | ⬜ |
+| 6 | Спецсимволы | `<script>`, `'; DROP` | санитизировано | ⬜ |
+| 7 | Параллельность | параллельные запросы | нет race condition | ⬜ |
+| 8 | Сетевая ошибка | timeout/500 | корректная обработка | ⬜ |
 
-### 4. Coverage Check
+### 4. Проверка покрытия
 
 ```bash
 # Проверь coverage после тестов
@@ -147,7 +147,7 @@ pytest --cov=src --cov-report=term-missing
 # Минимум 80% для новых файлов
 ```
 
-## Test Timing Constraints
+## Ограничения по времени
 
 | Тип теста | Таймаут | Общее время |
 |-----------|---------|-------------|
@@ -155,7 +155,7 @@ pytest --cov=src --cov-report=term-missing
 | Integration | 30 сек/тест | < 2 мин total |
 | E2E | 60 сек/тест | < 5 мин total |
 
-## Error Handling
+## Обработка ошибок
 
 | Проблема | Решение |
 |----------|---------|
@@ -165,90 +165,90 @@ pytest --cov=src --cov-report=term-missing
 | Missing fixtures | Проверить `conftest.py` |
 | Import errors | Проверить `PYTHONPATH` и `__init__.py` |
 
-## Output Format
+## Формат вывода
 
 ```markdown
-## Test Results: $ARGUMENTS
+## Результаты тестирования: $ARGUMENTS
 
-**Date:** [timestamp]
-**Environment:** [dev/staging/prod]
-**Test Command:** `[command used]`
+**Дата:** [timestamp]
+**Окружение:** [dev/staging/prod]
+**Команда тестирования:** `[использованная команда]`
 
 ---
 
-### Summary
+### Резюме
 
-| Type | Total | Pass | Fail | Skip |
-|------|-------|------|------|------|
+| Тип | Всего | Прошло | Упало | Пропущено |
+|-----|-------|--------|-------|-----------|
 | Unit | X | X | X | X |
 | Integration | X | X | X | X |
 | E2E | X | X | X | X |
 
-**Overall Status:** ✅ PASS / ⚠️ PARTIAL / ❌ FAIL
+**Общий статус:** ✅ ПРОЙДЕНО / ⚠️ ЧАСТИЧНО / ❌ ПРОВАЛЕНО
 
 ---
 
-### Coverage
+### Покрытие
 
-| Metric | Before | After | Delta |
-|--------|--------|-------|-------|
-| Lines | X% | Y% | +/-Z% |
-| Branches | X% | Y% | +/-Z% |
-| Functions | X% | Y% | +/-Z% |
-
----
-
-### Scenarios Tested
-
-| # | Scenario | Expected | Actual | Status |
-|---|----------|----------|--------|--------|
-| 1 | Happy path | success | success | ✅ |
-| 2 | Empty input | error | error | ✅ |
-| 3 | Invalid | error | crashed | ❌ |
+| Метрика | До | После | Дельта |
+|---------|-----|-------|--------|
+| Строки | X% | Y% | +/-Z% |
+| Ветви | X% | Y% | +/-Z% |
+| Функции | X% | Y% | +/-Z% |
 
 ---
 
-### Failed Tests
+### Протестированные сценарии
+
+| # | Сценарий | Ожидаемо | Фактически | Статус |
+|---|----------|----------|------------|--------|
+| 1 | Основной путь | успех | успех | ✅ |
+| 2 | Пустой ввод | ошибка | ошибка | ✅ |
+| 3 | Невалидный | ошибка | крэш | ❌ |
+
+---
+
+### Проваленные тесты
 
 1. **`test_name`**
-   - **Expected:** [what should happen]
-   - **Actual:** [what happened]
+   - **Ожидалось:** [что должно было произойти]
+   - **Фактически:** [что произошло]
    - **Stack trace:**
      ```
-     [error details]
+     [детали ошибки]
      ```
-   - **Likely cause:** [analysis]
+   - **Вероятная причина:** [анализ]
 
 ---
 
-### Bugs Found
+### Найденные баги
 
-1. **[CRITICAL/HIGH/MEDIUM/LOW]** [Title]
-   - **Steps to reproduce:**
-     1. [step 1]
-     2. [step 2]
-   - **Expected:** [expected behavior]
-   - **Actual:** [actual behavior]
-   - **Screenshot:** [if available]
-
----
-
-### Recommendations
-
-- [ ] Fix bug: [description]
-- [ ] Add test for: [missing scenario]
-- [ ] Increase coverage for: [area]
+1. **[КРИТИЧНО/ВЫСОКО/СРЕДНЕ/НИЗКО]** [Заголовок]
+   - **Шаги воспроизведения:**
+     1. [шаг 1]
+     2. [шаг 2]
+   - **Ожидалось:** [ожидаемое поведение]
+   - **Фактически:** [фактическое поведение]
+   - **Скриншот:** [если доступен]
 
 ---
 
-### Next Steps
+### Рекомендации
 
-- [ ] Fix failing tests → `/implement`
-- [ ] Code review → `/review`
-- [ ] Or mark as done
+- [ ] Исправить баг: [описание]
+- [ ] Добавить тест для: [недостающий сценарий]
+- [ ] Увеличить покрытие для: [область]
+
+---
+
+### Следующие шаги
+
+- [ ] Исправить проваленные тесты → `/implement`
+- [ ] Код-ревью → `/review`
+- [ ] Или отметить как готово
 ```
 
-## Cleanup
+## Очистка
 
 ```bash
 # Stop dev server if started
@@ -257,7 +257,7 @@ if [ -n "$DEV_PID" ]; then
 fi
 ```
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Тесты зависящие друг от друга
@@ -272,7 +272,7 @@ fi
 - Cleanup после тестов
 - Документировать все найденные баги
 
-## Quality Checklist
+## Чеклист качества
 
 Перед завершением проверь:
 
@@ -282,7 +282,7 @@ fi
 - [ ] Все баги задокументированы
 - [ ] Dev server остановлен
 
-## Important Notes
+## Важные заметки
 
 - Тестируй как **РЕАЛЬНЫЙ ПОЛЬЗОВАТЕЛЬ**, не как разработчик
 - Не полагайся только на unit тесты — E2E критичны
@@ -290,7 +290,7 @@ fi
 - Screenshots помогают понять visual bugs
 - Flaky tests требуют особого внимания
 
-## Update Progress
+## Обновление прогресса
 
 После завершения тестирования добавь запись в `.claude-workspace/progress.md`:
 

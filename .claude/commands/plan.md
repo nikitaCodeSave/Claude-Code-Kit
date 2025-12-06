@@ -2,14 +2,14 @@
 description: Создаёт детальный план реализации фичи или задачи. Использовать при упоминании "plan", "design", "architect", или перед реализацией фич > 50 строк кода.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
-# Plan Feature/Task: $ARGUMENTS
+# Планирование фичи/задачи: $ARGUMENTS
 
 > `$ARGUMENTS` — описание задачи после команды
 > Пример: `/plan user authentication` → $ARGUMENTS = "user authentication"
 
 Создай детальный план для задачи. **НЕ ПИШИ КОД.**
 
-## Context Discovery
+## Сбор контекста
 
 При вызове СНАЧАЛА:
 
@@ -24,7 +24,7 @@ cat .claude-workspace/current-task.md 2>/dev/null | head -15
 git log --oneline -5 2>/dev/null
 ```
 
-## Task Size Matrix
+## Матрица размера задачи
 
 | Размер | Строк кода | Шагов | Подход |
 |--------|------------|-------|--------|
@@ -33,9 +33,9 @@ git log --oneline -5 2>/dev/null
 | L | 200-500 | 7-10 | Декомпозиция на подзадачи |
 | XL | > 500 | 10+ | Несколько /plan сессий |
 
-## Process
+## Процесс
 
-### 1. Explore (используй explore-agent для сложных задач)
+### 1. Исследование (используй explore-agent для сложных задач)
 
 ```bash
 # Изучи структуру проекта
@@ -51,7 +51,7 @@ rg "@(app|router)\.(get|post|put|delete|patch)" --type py -C 2 | head -30
 cat CLAUDE.md 2>/dev/null | head -50
 ```
 
-### 2. Think Hard о подходе
+### 2. Глубокий анализ подхода
 
 Ответь на вопросы:
 - Какие файлы нужно изменить?
@@ -61,60 +61,60 @@ cat CLAUDE.md 2>/dev/null | head -50
 - Как это повлияет на существующий код?
 - Какие тесты нужны?
 
-### 3. Document Plan
+### 3. Документирование плана
 
 Запиши план в `.claude-workspace/current-task.md`:
 
 ```markdown
-## Task: [название]
+## Задача: [название]
 
-### Objective
+### Цель
 [Чёткая цель в 1-2 предложения]
 
-### Complexity: S/M/L/XL
-### Estimated Steps: N
-### Risk Level: Low/Medium/High
+### Сложность: S/M/L/XL
+### Количество шагов: N
+### Уровень риска: Низкий/Средний/Высокий
 
-### Scope
-**In Scope:**
+### Область
+**Входит в scope:**
 - ...
 
-**Out of Scope:**
+**Не входит в scope:**
 - ...
 
-### Implementation Steps
-1. [ ] **Step 1: [Title]**
-   - Files: `path/to/file`
-   - Changes: [what to change]
-   - Tests: [what to test]
-   - Estimated time: X min
+### Шаги реализации
+1. [ ] **Шаг 1: [Заголовок]**
+   - Файлы: `path/to/file`
+   - Изменения: [что изменить]
+   - Тесты: [что тестировать]
+   - Оценка времени: X мин
 
-2. [ ] **Step 2: [Title]**
+2. [ ] **Шаг 2: [Заголовок]**
    ...
 
-### Files to Create
-- `src/services/new_service.py` — [purpose]
-- `tests/test_new_service.py` — [tests]
+### Файлы для создания
+- `src/services/new_service.py` — [назначение]
+- `tests/test_new_service.py` — [тесты]
 
-### Files to Modify
-- `src/main.py` — [what changes]
+### Файлы для изменения
+- `src/main.py` — [какие изменения]
 
-### Dependencies
-- [если нужны новые пакеты в pyproject.toml]
+### Зависимости
+- [если нужны новые пакеты в requirements.txt]
 
-### Success Criteria
-- [ ] All tests pass
-- [ ] No linting errors
-- [ ] [Specific criterion 1]
-- [ ] [Specific criterion 2]
+### Критерии успеха
+- [ ] Все тесты проходят
+- [ ] Нет ошибок линтера
+- [ ] [Конкретный критерий 1]
+- [ ] [Конкретный критерий 2]
 
-### Risks & Mitigations
-| Risk | Mitigation |
-|------|------------|
+### Риски и митигации
+| Риск | Митигация |
+|------|-----------|
 | ... | ... |
 ```
 
-### 4. Update Tracking
+### 4. Обновление отслеживания
 
 ```bash
 # Обнови progress.md
@@ -125,7 +125,7 @@ echo "" >> .claude-workspace/progress.md
 # Если новая фича - добавь в features.json
 ```
 
-### 5. Document Architecture Decisions (если применимо)
+### 5. Документирование архитектурных решений (если применимо)
 
 Если при планировании был выбран один подход из нескольких возможных,
 добавь запись в `.claude-workspace/decisions.md`:
@@ -133,26 +133,26 @@ echo "" >> .claude-workspace/progress.md
 ```markdown
 ## ADR-NNN: [Название решения]
 
-**Date:** $(date '+%Y-%m-%d')
-**Status:** Accepted
-**Context:** $ARGUMENTS
+**Дата:** $(date '+%Y-%m-%d')
+**Статус:** Принято
+**Контекст:** $ARGUMENTS
 
-### Context
+### Контекст
 [Почему возникла необходимость выбора]
 
-### Decision
+### Решение
 [Что было выбрано и почему]
 
-### Alternatives Considered
+### Рассмотренные альтернативы
 - [Вариант A] — [почему отклонён]
 - [Вариант B] — [почему отклонён]
 
-### Consequences
+### Последствия
 - [Положительные последствия]
 - [Риски или компромиссы]
 ```
 
-## Constraints
+## Ограничения
 
 ### ЗАПРЕЩЕНО
 - Писать код в плане (только описания)
@@ -165,11 +165,11 @@ echo "" >> .claude-workspace/progress.md
 - Включить тесты в каждый шаг
 - Использовать "think hard" или "ultrathink" для сложных задач
 
-## Approval Process
+## Процесс одобрения
 
 После создания плана:
 
-1. Покажи краткое summary (5-7 пунктов):
+1. Покажи краткое резюме (5-7 пунктов):
    - Цель
    - Размер (S/M/L/XL)
    - Количество шагов
@@ -181,8 +181,8 @@ echo "" >> .claude-workspace/progress.md
 
 3. Дождись явного подтверждения ("да", "proceed", "начинай")
 
-## Output
+## Вывод
 
 После создания плана:
-1. Покажи краткое summary
+1. Покажи краткое резюме
 2. Спроси: "План готов. Начинаем имплементацию с `/implement`?"
