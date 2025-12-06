@@ -1,8 +1,37 @@
 {
-  "project": "Claude-Code-Kit",
-  "description": "Template/toolkit for Claude Code workflows with agents, commands, and workspace structure",
-  "lastUpdated": "",
-  "features": [],
+  "project": "task-cli",
+  "description": "Simple CLI task manager - testing Claude Code Kit workflow",
+  "lastUpdated": "2025-12-06T15:00:00Z",
+  "features": [
+    {
+      "id": "F001",
+      "name": "Add Task",
+      "status": "pending",
+      "priority": "1",
+      "description": "CLI command to add new task with title"
+    },
+    {
+      "id": "F002",
+      "name": "List Tasks",
+      "status": "pending",
+      "priority": "1",
+      "description": "CLI command to list all tasks"
+    },
+    {
+      "id": "F003",
+      "name": "Complete Task",
+      "status": "pending",
+      "priority": "2",
+      "description": "CLI command to mark task as done"
+    },
+    {
+      "id": "F004",
+      "name": "Delete Task",
+      "status": "pending",
+      "priority": "3",
+      "description": "CLI command to delete a task"
+    }
+  ],
   "statusLegend": {
     "pending": "Not started",
     "planned": "Plan created, not implemented",

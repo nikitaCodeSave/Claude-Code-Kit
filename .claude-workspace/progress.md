@@ -8,26 +8,22 @@
 
 ---
 
-## Session Template
-```
-## Session: YYYY-MM-DD HH:MM
+## Session: 2025-12-06 15:00
 
 ### Started
-- **Task:** What you're working on
-- **Context:** Any relevant background
+- **Task:** Инициализация мини-проекта Task CLI для тестирования workflow
+- **Context:** Тестируем полный цикл Claude Code Kit: init → plan → implement → review
 
-### Completed
-- [x] What was done
-- [ ] What wasn't finished
+### In Progress
+- [x] Создана структура Python проекта (src/, tests/, pyproject.toml)
+- [ ] Запланировать первую фичу (add task)
+- [ ] Реализовать через TDD
+- [ ] Провести code review
 
-### Commits
-- `abc1234` - commit message
-
-### Notes for Next Session
-- Important context to remember
-- Blockers or issues
-- Next steps
-```
+### Notes
+- Проект: простой CLI менеджер задач
+- Функции: add, list, done, delete
+- Хранение: JSON файл
 
 ---
 
