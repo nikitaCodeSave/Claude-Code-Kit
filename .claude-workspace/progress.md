@@ -18,7 +18,7 @@
 - [x] Создана структура Python проекта (src/, tests/, pyproject.toml)
 - [x] /plan add-task — создан план F001
 - [x] /implement — реализовано через TDD (3 шага)
-- [ ] /review — ожидает
+- [x] /review — ✅ APPROVED (5/5 stars)
 
 ### Commits
 - `ad151a7` - feat: initialize Task CLI mini-project
