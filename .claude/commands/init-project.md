@@ -71,7 +71,6 @@ fi
 mkdir -p .claude-workspace
 mkdir -p .claude/commands
 mkdir -p .claude/agents
-mkdir -p .claude/hooks
 ```
 
 ### 3. Create Tracking Files
@@ -228,10 +227,9 @@ fi
 └── decisions.md     ✅
 
 .claude/
-├── agents/          [X agents]
-├── commands/        [X commands]
-├── hooks/           [configured/not configured]
-└── settings.json    [exists/missing]
+├── agents/              [X agents]
+├── commands/            [X commands]
+└── settings.local.json  [exists/missing]
 ```
 
 ### CLAUDE.md

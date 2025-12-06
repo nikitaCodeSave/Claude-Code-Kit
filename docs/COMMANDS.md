@@ -42,7 +42,6 @@
    - `.claude-workspace/`
    - `.claude/commands/`
    - `.claude/agents/`
-   - `.claude/hooks/`
 3. Создаёт tracking файлы:
    - `progress.md`
    - `features.json`
