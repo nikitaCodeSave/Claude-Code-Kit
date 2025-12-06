@@ -28,7 +28,7 @@
 
 ### Implementation Steps
 
-#### 1. [ ] **Step 1: Task Model + Tests**
+#### 1. [x] **Step 1: Task Model + Tests** ✅
    - **Files:** `src/task.py`, `tests/test_task.py`
    - **Changes:**
      - Dataclass Task с полями: id (uuid), title (str), done (bool=False), created_at (datetime)
@@ -39,7 +39,7 @@
      - test_task_from_dict
    - **Estimated time:** 10 min
 
-#### 2. [ ] **Step 2: Storage + Tests**
+#### 2. [x] **Step 2: Storage + Tests** ✅
    - **Files:** `src/storage.py`, `tests/test_storage.py`
    - **Changes:**
      - Class TaskStorage с методами: load(), save(), add_task()
@@ -49,7 +49,7 @@
      - test_storage_persistence (save/load)
    - **Estimated time:** 10 min
 
-#### 3. [ ] **Step 3: CLI + Integration Test**
+#### 3. [x] **Step 3: CLI + Integration Test** ✅
    - **Files:** `src/cli.py`, `tests/test_cli.py`
    - **Changes:**
      - argparse с subcommand `add`
@@ -77,10 +77,10 @@
 ---
 
 ### Success Criteria
-- [ ] `python -m src.cli add "Buy milk"` создаёт задачу
-- [ ] Задача сохраняется в tasks.json
-- [ ] Все тесты проходят: `pytest tests/ -v`
-- [ ] Код чистый, без warnings
+- [x] `python -m src.cli add "Buy milk"` создаёт задачу
+- [x] Задача сохраняется в tasks.json
+- [x] Все тесты проходят: `pytest tests/ -v` (11 tests)
+- [x] Код чистый, без warnings
 
 ---
 
