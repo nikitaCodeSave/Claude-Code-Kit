@@ -64,3 +64,6 @@ dmypy.json
 # Claude Code local files
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Task CLI data
+tasks.json
