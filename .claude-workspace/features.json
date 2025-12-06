@@ -6,7 +6,7 @@
     {
       "id": "F001",
       "name": "Add Task",
-      "status": "pending",
+      "status": "planned",
       "priority": "1",
       "description": "CLI command to add new task with title"
     },

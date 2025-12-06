@@ -1,55 +1,105 @@
 # Current Task
 
-No active task. 
-
-## Quick Start
-1. Run `/plan [feature name]` to create a plan
-2. After plan is approved, run `/implement`
-3. Run `/review` to verify changes
-4. Run `/test [feature]` for E2E testing
-
-## Task Template
-When a task is active, this file will contain:
-
-```markdown
-## Task: [Feature Name]
+## Task: Add Task Command (F001)
 
 ### Objective
-[Clear goal in 1-2 sentences]
+Реализовать CLI команду `task add "title"` для добавления новой задачи в JSON хранилище.
+
+### Complexity: S (Small)
+### Estimated Steps: 3
+### Risk Level: Low
+
+---
 
 ### Scope
+
 **In Scope:**
-- Item 1
-- Item 2
+- Модель Task с полями id, title, done, created_at
+- Storage класс для работы с JSON файлом
+- CLI команда `add` через argparse
+- Юнит-тесты для всех компонентов
 
 **Out of Scope:**
-- Item 1
+- Команды list, done, delete (отдельные фичи)
+- Валидация ввода (пустой title)
+- Конфигурация пути к файлу
+
+---
 
 ### Implementation Steps
-1. [ ] Step 1 - description
-2. [ ] Step 2 - description
-3. [ ] Step 3 - description
-4. [ ] Write tests
-5. [ ] Update documentation
 
-### Files to Modify
-- `path/to/file.py` - reason for change
+#### 1. [ ] **Step 1: Task Model + Tests**
+   - **Files:** `src/task.py`, `tests/test_task.py`
+   - **Changes:**
+     - Dataclass Task с полями: id (uuid), title (str), done (bool=False), created_at (datetime)
+     - Методы to_dict() и from_dict()
+   - **Tests:**
+     - test_task_creation
+     - test_task_to_dict
+     - test_task_from_dict
+   - **Estimated time:** 10 min
+
+#### 2. [ ] **Step 2: Storage + Tests**
+   - **Files:** `src/storage.py`, `tests/test_storage.py`
+   - **Changes:**
+     - Class TaskStorage с методами: load(), save(), add_task()
+     - Хранение в ~/.tasks.json (или tasks.json в cwd)
+   - **Tests:**
+     - test_storage_add_task
+     - test_storage_persistence (save/load)
+   - **Estimated time:** 10 min
+
+#### 3. [ ] **Step 3: CLI + Integration Test**
+   - **Files:** `src/cli.py`, `tests/test_cli.py`
+   - **Changes:**
+     - argparse с subcommand `add`
+     - main() function как entry point
+   - **Tests:**
+     - test_cli_add_task (integration)
+   - **Estimated time:** 10 min
+
+---
 
 ### Files to Create
-- `path/to/new.py` - purpose
+- `src/task.py` — Task dataclass model
+- `src/storage.py` — JSON storage handler
+- `src/cli.py` — CLI entry point
+- `tests/test_task.py` — Task model tests
+- `tests/test_storage.py` — Storage tests
+- `tests/test_cli.py` — CLI integration tests
+
+### Files to Modify
+- `src/__init__.py` — exports (optional)
 
 ### Dependencies
-- package-name: reason
+- None (stdlib only: json, uuid, datetime, argparse, dataclasses)
+
+---
 
 ### Success Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] All tests pass
-- [ ] No linting errors
+- [ ] `python -m src.cli add "Buy milk"` создаёт задачу
+- [ ] Задача сохраняется в tasks.json
+- [ ] Все тесты проходят: `pytest tests/ -v`
+- [ ] Код чистый, без warnings
 
-### Risks
-- Risk 1: mitigation strategy
+---
 
-### Notes
-[Any additional context]
+### Risks & Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| File permissions | Использовать try/except при записи |
+| JSON corruption | Atomic write (write to temp, then rename) |
+
+---
+
+### TDD Order
+```
+RED    → test_task_creation fails (no Task class)
+GREEN  → implement Task dataclass
+RED    → test_storage_add_task fails (no Storage)
+GREEN  → implement TaskStorage
+RED    → test_cli_add_task fails (no cli.py)
+GREEN  → implement CLI
+REFACTOR → cleanup, docstrings
 ```
