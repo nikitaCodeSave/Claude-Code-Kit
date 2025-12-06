@@ -5,7 +5,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 # Планирование фичи/задачи: $ARGUMENTS
 
 > `$ARGUMENTS` — описание задачи после команды
-> Пример: `/plan user authentication` → $ARGUMENTS = "user authentication"
+> Пример: `/create-plan user authentication` → $ARGUMENTS = "user authentication"
 
 Создай детальный план для задачи. **НЕ ПИШИ КОД.**
 
@@ -31,7 +31,7 @@ git log --oneline -5 2>/dev/null
 | S | < 50 | 1-3 | Простой план |
 | M | 50-200 | 4-6 | Детальный план |
 | L | 200-500 | 7-10 | Декомпозиция на подзадачи |
-| XL | > 500 | 10+ | Несколько /plan сессий |
+| XL | > 500 | 10+ | Несколько /create-plan сессий |
 
 ## Процесс
 

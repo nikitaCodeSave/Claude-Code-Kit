@@ -86,7 +86,7 @@ sequenceDiagram
     C-->>U: ✅ Workspace готов
 
     Note over U,G: Фаза 2: Планирование
-    U->>C: /plan добавить авторизацию
+    U->>C: /create-plan добавить авторизацию
     C->>L: Делегировать планирование
     L->>E: Исследовать codebase
     E->>E: Glob, Grep, Read
@@ -147,7 +147,7 @@ flowchart TD
     INIT_CMD --> PLAN
     INIT -->|Да| PLAN
     
-    PLAN[/plan feature/] --> THINK[Lead Agent:<br/>Think Hard]
+    PLAN[/create-plan feature/] --> THINK[Lead Agent:<br/>Think Hard]
     THINK --> EXPLORE[Explore Agent:<br/>Исследование codebase]
     EXPLORE --> CREATE_PLAN[Создать план<br/>в current-task.md]
     CREATE_PLAN --> APPROVE{User:<br/>Approve план?}
@@ -259,7 +259,7 @@ flowchart TD
     
     RUN_TEST_FAIL --> COMPLEXITY{Fix сложный<br/>> 20 LOC?}
     
-    COMPLEXITY -->|Да| ESCALATE[/plan fix/]
+    COMPLEXITY -->|Да| ESCALATE[/create-plan fix/]
     ESCALATE --> END_PLAN([Создать план])
     
     COMPLEXITY -->|Нет| FIX[Исправить код]
@@ -290,7 +290,7 @@ flowchart TD
 flowchart TD
     START([🔧 Quick Fix]) --> ASSESS{Изменения<br/>< 20 LOC?}
     
-    ASSESS -->|Нет| ESCALATE[/plan/]
+    ASSESS -->|Нет| ESCALATE[/create-plan/]
     ESCALATE --> END_PLAN([Полный цикл])
     
     ASSESS -->|Да| TYPE{Тип<br/>изменения?}
@@ -455,7 +455,7 @@ flowchart TD
 stateDiagram-v2
     [*] --> Backlog: Новая задача
     
-    Backlog --> Planning: /plan
+    Backlog --> Planning: /create-plan
     
     Planning --> Planned: План готов
     Planning --> Backlog: Отменено
@@ -504,8 +504,8 @@ flowchart TD
     START([🤔 Что делать?]) --> TYPE{Тип задачи?}
     
     TYPE -->|Новая фича| SIZE{Размер?}
-    SIZE -->|Большая| PLAN[/plan/]
-    SIZE -->|Маленькая| QUICK_PLAN[/plan/ краткий]
+    SIZE -->|Большая| PLAN[/create-plan/]
+    SIZE -->|Маленькая| QUICK_PLAN[/create-plan/ краткий]
     
     TYPE -->|Баг| BUG_SIZE{Размер фикса?}
     BUG_SIZE -->|< 20 LOC| QUICK[/quick-fix/]
@@ -558,7 +558,7 @@ flowchart TB
     
     CMD --> DETECT
     
-    DETECT -->|plan, think| LEAD
+    DETECT -->|create-plan, think| LEAD
     DETECT -->|find, search, where| EXPLORE
     DETECT -->|implement, fix, create| CODE
     DETECT -->|test, check, verify| TEST

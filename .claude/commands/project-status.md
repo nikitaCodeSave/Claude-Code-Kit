@@ -157,7 +157,7 @@ FEATURES=$(cat .claude-workspace/features.json 2>/dev/null | jq -r '.features[] 
 | Ситуация | Рекомендация |
 |----------|--------------|
 | Workspace не создан | `/init-project` |
-| Нет текущей задачи | `/plan [feature]` |
+| Нет текущей задачи | `/create-plan [feature]` |
 | Есть план, не начат | `/implement` |
 | Есть изменения, готово | `/review` |
 | Есть failed tests | `/test [feature]` |

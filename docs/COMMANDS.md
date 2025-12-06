@@ -7,7 +7,7 @@
 | Команда | Описание | Когда использовать |
 |---------|----------|-------------------|
 | `/init-project` | Инициализация проекта | Один раз в начале |
-| `/plan [feature]` | Планирование фичи | Перед реализацией > 50 LOC |
+| `/create-plan [feature]` | Планирование фичи | Перед реализацией > 50 LOC |
 | `/implement` | Реализация по плану | После одобрения плана |
 | `/review` | Код-ревью | После реализации |
 | `/test [feature]` | Тестирование | После реализации |
@@ -59,13 +59,13 @@
 
 ### Связанные
 
-- После: `/project-status`, `/plan`
+- После: `/project-status`, `/create-plan`
 
 ---
 
-## /plan
+## /create-plan
 
-**Файл:** `.claude/commands/plan.md`
+**Файл:** `.claude/commands/create-plan.md`
 
 ### Описание
 
@@ -74,19 +74,19 @@
 ### Когда использовать
 
 - Перед реализацией любой фичи > 50 строк кода
-- Когда пользователь говорит "plan", "design", "architect"
+- Когда пользователь говорит "create-plan", "design", "architect"
 - Для сложных задач требующих декомпозиции
 
 ### Аргументы
 
 ```
-/plan [описание фичи]
+/create-plan [описание фичи]
 ```
 
 Примеры:
-- `/plan user authentication`
-- `/plan add dark mode toggle`
-- `/plan refactor database layer`
+- `/create-plan user authentication`
+- `/create-plan add dark mode toggle`
+- `/create-plan refactor database layer`
 
 ### Что делает
 
@@ -107,7 +107,7 @@
 ### Пример использования
 
 ```
-/plan implement JWT authentication
+/create-plan implement JWT authentication
 
 # Выход:
 ## Task: JWT Authentication
@@ -142,7 +142,7 @@
 
 ### Когда использовать
 
-- После одобрения плана (`/plan`)
+- После одобрения плана (`/create-plan`)
 - Когда есть готовый план в `current-task.md`
 
 ### Аргументы
@@ -187,7 +187,7 @@ Step 2/5: Create auth middleware
 ### Связанные
 
 - **Агент:** `code-agent`
-- **До:** `/plan`
+- **До:** `/create-plan`
 - **После:** `/review`
 
 ---
@@ -387,7 +387,7 @@ Step 2/5: Create auth middleware
 
 ### Constraints
 
-Если fix сложнее чем ожидалось — команда останавливается и рекомендует `/plan`.
+Если fix сложнее чем ожидалось — команда останавливается и рекомендует `/create-plan`.
 
 ### Пример использования
 
@@ -412,7 +412,7 @@ Email regex не принимал домены с цифрами.
 
 ### Связанные
 
-- **Альтернатива:** `/plan` (для сложных фиксов)
+- **Альтернатива:** `/create-plan` (для сложных фиксов)
 
 ---
 
@@ -574,15 +574,16 @@ Touch event handler не был привязан.
            │                   │                   │
            v                   v                   v
     ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-    │ /init-project│   │ > 50 LOC?    │   │ GitHub issue?│
+    │ /init-project│   │  > 50 LOC?   │   │ GitHub issue?│
     └──────────────┘   └──────┬───────┘   └──────┬───────┘
                               │                   │
                     ┌─────────┴─────────┐   ┌─────┴─────┐
                     │                   │   │           │
                     v                   v   v           v
              ┌──────────┐         ┌──────────┐   ┌──────────┐
-             │  /plan   │         │/implement│   │/fix-issue│
-             └────┬─────┘         │ напрямую │   └──────────┘
+             │/create-  │         │/implement│   │/fix-issue│
+             │  plan    │         │ напрямую │   └──────────┘
+             └────┬─────┘         └──────────┘
                   │               └──────────┘
                   v                              ┌──────────┐
              ┌──────────┐                        │< 20 LOC? │
@@ -591,6 +592,6 @@ Touch event handler не был привязан.
                   │                         ┌────────┴────────┐
                   v                         v                 v
              ┌──────────┐            ┌──────────┐      ┌──────────┐
-             │ /review  │            │/quick-fix│      │  /plan   │
+             │ /review  │            │/quick-fix│      │/create-plan│
              └──────────┘            └──────────┘      └──────────┘
 ```

@@ -25,8 +25,8 @@
 
 ### Когда вызывается
 
-- Автоматически при `/plan`
-- Когда пользователь говорит: "plan", "think hard", "think harder", "ultrathink", "design", "architect"
+- Автоматически при `/create-plan`
+- Когда пользователь говорит: "create-plan", "think hard", "think harder", "ultrathink", "design", "architect"
 - Перед реализацией фичи > 50 LOC
 
 ### Ответственности

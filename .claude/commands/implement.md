@@ -12,7 +12,7 @@ allowed-tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob
 
 ```bash
 # 1. Текущий план
-cat .claude-workspace/current-task.md 2>/dev/null || echo "ERROR: No plan. Run /plan first."
+cat .claude-workspace/current-task.md 2>/dev/null || echo "ERROR: No plan. Run /create-plan first."
 
 # 2. Git status
 git status --short 2>/dev/null
@@ -29,7 +29,7 @@ pytest --co -q 2>/dev/null | tail -5 || echo "No tests found"
 ```bash
 # 1. Проверь что план существует
 if [ ! -f .claude-workspace/current-task.md ]; then
-  echo "ERROR: No plan found. Run /plan first."
+  echo "ERROR: No plan found. Run /create-plan first."
   exit 1
 fi
 
@@ -114,7 +114,7 @@ pytest --cov=src --cov-report=term-missing 2>/dev/null | tail -20
 | Ситуация | Действие |
 |----------|----------|
 | Тест не проходит > 15 мин | Спросить пользователя, записать в progress.md |
-| План неверен | Вернуться к /plan, обновить план |
+| План неверен | Вернуться к /create-plan, обновить план |
 | Dependency conflict | Документировать в decisions.md, решить |
 | Flaky test | Пометить `@pytest.mark.flaky`, исследовать |
 | Build fails | Исправить до продолжения |

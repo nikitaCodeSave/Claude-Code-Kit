@@ -3,7 +3,7 @@
 No active task. 
 
 ## Quick Start
-1. Run `/plan [feature name]` to create a plan
+1. Run `/create-plan [feature name]` to create a plan
 2. After plan is approved, run `/implement`
 3. Run `/review` to verify changes
 4. Run `/test [feature]` for E2E testing
