@@ -128,11 +128,39 @@ echo "Test directory: $TEST_DIR"
 │     - git add .                     │
 │     - git commit -m "type(scope):"  │
 ├─────────────────────────────────────┤
-│  5. Update Tracking                 │
-│     - Отметь шаг в current-task.md  │
-│     - Добавь в progress.md          │
+│  5. Update Tracking ⚠️ ОБЯЗАТЕЛЬНО  │
+│     - Edit: [ ] → [x] в task.md     │
+│     - echo >> progress.md           │
+│     - Проверь: grep "[x].*Step"     │
 └─────────────────────────────────────┘
 ```
+
+## После КАЖДОГО шага (ОБЯЗАТЕЛЬНО)
+
+После коммита **НЕМЕДЛЕННО** обнови tracking. Не переходи к следующему шагу пока не выполнишь:
+
+### 1. Отметить шаг в current-task.md
+
+Используй **Edit tool**:
+```
+old_string: "- [ ] **Step N:** [название шага]"
+new_string: "- [x] **Step N:** [название шага]"
+```
+
+### 2. Добавить в progress.md
+
+```bash
+echo "- $(date '+%H:%M') Step N: [краткое описание]" >> .claude-workspace/progress.md
+```
+
+### 3. ПРОВЕРКА
+
+Перед следующим шагом выполни:
+```bash
+grep "\[x\]" .claude-workspace/current-task.md | tail -1
+```
+
+Должен увидеть только что отмеченный шаг. **Если нет — СТОП, вернись и отметь!**
 
 ## Commit Message Format
 
@@ -180,33 +208,50 @@ test(api): add edge case tests for user endpoint
 
 ## Atomic Commit Definition
 
-**Атомарный коммит** — одно логическое изменение, которое можно откатить без поломки функциональности.
+**Атомарный коммит** — один ЛОГИЧЕСКИЙ ШАГ из плана, НЕ один файл.
 
-**ПРАВИЛЬНО (атомарно):**
-```
-test(auth): add test for validate_token
-feat(auth): implement validate_token function
-refactor(auth): rename token → access_token
+Один шаг из `current-task.md` = один коммит (тест + код + рефакторинг этого шага).
+
+**ПРАВИЛЬНО:**
+```bash
+# Шаг 3 плана: Implement fetcher module
+git add src/web2md/fetcher.py tests/test_fetcher.py
+git commit -m "feat(web2md): implement fetcher module
+
+- Add fetch_url() with timeout and retries
+- Add tests for success/error cases
+
+Step 3/7 of current task"
 ```
 
-**НЕПРАВИЛЬНО (не атомарно):**
-```
-feat(auth): add JWT validation AND update middleware AND fix permissions
-# → Разбей на 3 коммита!
+**НЕПРАВИЛЬНО:**
+```bash
+# Избыточно! Не делай отдельные коммиты для теста и кода одного шага:
+git add tests/test_fetcher.py && git commit -m "test(web2md): add fetcher tests"
+git add src/web2md/fetcher.py && git commit -m "feat(web2md): add fetcher"
+
+# Тоже неправильно — слишком много в одном коммите:
+git commit -m "feat(web2md): add fetcher AND parser AND converter"
 ```
 
-**Правило:** Если в сообщении есть "и" / "AND" / "+" → разбей на отдельные коммиты
+**Правила:**
+1. Один шаг плана → один коммит (тест + код вместе)
+2. Если в сообщении "AND" / "+" → разбей на ШАГИ, не на файлы
+3. Рефакторинг в рамках шага — часть того же коммита
 
 ## Clean State Checklist
 
-Перед завершением сессии проверь:
+### Перед КАЖДЫМ следующим шагом
+- [ ] Предыдущий шаг отмечен `[x]` в current-task.md
+- [ ] Запись о шаге добавлена в progress.md
 
+### Перед завершением сессии
 - [ ] Все тесты проходят (`npm test` / `pytest`)
 - [ ] Нет linting errors (`npm run lint` / `ruff check .`)
 - [ ] Нет `console.log` / `print` statements в production коде
 - [ ] Нет uncommitted changes (или intentionally staged)
-- [ ] `progress.md` обновлён
-- [ ] `current-task.md` шаги отмечены
+- [ ] Все выполненные шаги отмечены `[x]` в current-task.md
+- [ ] progress.md содержит записи о каждом выполненном шаге
 - [ ] Код компилируется без ошибок
 
 ## Error Recovery
