@@ -7,6 +7,21 @@
 
 ---
 
+## [COMPLETED] 2025-12-07 22:30 - Web Page to Markdown Parser (web2md)
+
+### Summary
+- **Шаги:** 8/8 выполнено
+- **Тесты:** 137 passed, 90% coverage
+- **Коммиты:** 9
+- **Архив:** `.claude-workspace/archive/2025-12-07-web2md.md`
+
+### Результат
+- CLI утилита `web2md` для парсинга веб-страниц в Markdown
+- Multi-extractor стратегия (Trafilatura + Readability fallback)
+- Полное покрытие тестами, прошёл code review
+
+---
+
 ## [2025-12-07 22:15] - IMPLEMENT: Web Page to Markdown Parser (web2md) - GREEN
 - Все 137 тестов проходят
 - Coverage: 91%
