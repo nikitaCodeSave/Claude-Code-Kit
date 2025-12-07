@@ -44,7 +44,6 @@
 - [x] test-agent.md — переписан на Python-first, добавлены async/mocking (204→324 строк)
 - [x] review-agent.md — добавлены example findings (187→268 строк)
 - [x] explore-agent.md — уточнены constraints, добавлен fallback (142→200 строк)
-- [x] REFACTORING-PLAN.md — обновлён статус Фаз 1-4
 
 ### Commits
 - `1e598be` - refactor: phase 1 - critical fixes
