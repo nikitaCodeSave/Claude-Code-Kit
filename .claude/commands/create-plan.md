@@ -9,9 +9,23 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 
 Создай детальный план для задачи. **НЕ ПИШИ КОД.**
 
-## Сбор контекста
+## Проверка незавершённой задачи
 
-При вызове СНАЧАЛА:
+При вызове СНАЧАЛА проверь есть ли активная задача:
+
+```bash
+# Проверить текущую задачу
+TASK_CONTENT=$(cat .claude-workspace/current-task.md 2>/dev/null | head -5)
+```
+
+Если файл НЕ содержит "No active task" / "Нет активной задачи" и содержит "## Задача:" или "## Task:":
+> ⚠️ **Найдена незавершённая задача:**
+> [первые 3 строки current-task.md]
+>
+> Рекомендуется: `/complete-task` для архивации перед созданием нового плана.
+> Продолжить и перезаписать? (да/нет)
+
+## Сбор контекста
 
 ```bash
 # 1. Текущий прогресс
@@ -22,6 +36,9 @@ cat .claude-workspace/current-task.md 2>/dev/null | head -15
 
 # 3. Недавние коммиты (контекст)
 git log --oneline -5 2>/dev/null
+
+# 4. Статус фич
+cat .claude-workspace/features.json 2>/dev/null | head -20
 ```
 
 ## Матрица размера задачи
@@ -121,9 +138,24 @@ cat CLAUDE.md 2>/dev/null | head -50
 echo "## $(date '+%Y-%m-%d %H:%M') - Planning: $ARGUMENTS" >> .claude-workspace/progress.md
 echo "- Status: Plan created" >> .claude-workspace/progress.md
 echo "" >> .claude-workspace/progress.md
-
-# Если новая фича - добавь в features.json
 ```
+
+**Обнови features.json** — добавь/обнови запись со статусом "planned":
+
+```json
+{
+  "id": "FXXX",
+  "name": "$ARGUMENTS",
+  "slug": "[kebab-case от названия]",
+  "status": "planned",
+  "priority": "2",
+  "description": "[из цели задачи]",
+  "createdAt": "[текущий ISO timestamp]",
+  "updatedAt": "[текущий ISO timestamp]"
+}
+```
+
+Если фича с таким именем уже есть — обнови её статус на "planned" и updatedAt.
 
 ### 5. Документирование архитектурных решений (если применимо)
 

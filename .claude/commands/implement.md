@@ -44,7 +44,19 @@ git status --short
 
 # 5. Убедись что тесты проходят (baseline)
 pytest -v 2>&1 | tail -10
+
+# 6. Статус фич
+cat .claude-workspace/features.json 2>/dev/null | head -30
 ```
+
+### Обновление features.json
+
+При начале реализации обнови features.json:
+- Найди фичу по имени задачи
+- Установи `status: "in_progress"`
+- Обнови `updatedAt` на текущий timestamp
+
+Если фича не найдена — добавь запись со статусом "in_progress".
 
 ## Implementation Process
 
