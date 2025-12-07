@@ -1,8 +1,43 @@
 ---
 description: E2E тестирование фичи. Использовать после реализации для проверки работы как реальный пользователь. Поддерживает автоматическое и ручное тестирование.
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 ---
 # Тестирование фичи: $ARGUMENTS
+
+## Интеграция с агентами
+
+**РЕКОМЕНДУЕТСЯ** использовать Task tool для делегирования test-agent:
+
+```
+[Task: test-agent]
+prompt: |
+  ## Задача: E2E тестирование "$ARGUMENTS"
+
+  ### Контекст
+  - Фича: $ARGUMENTS
+  - План: .claude-workspace/current-task.md
+
+  ### Инструкции
+  1. Определи test framework (pytest/jest/vitest)
+  2. Найди существующие тесты для фичи
+  3. Запусти unit/integration тесты
+  4. Проведи E2E тестирование (API/UI)
+  5. Проверь coverage
+
+  ### Матрица сценариев
+  - Happy path
+  - Empty/null input
+  - Invalid format
+  - Boundary cases
+  - Special characters
+  - Concurrent access
+
+  ### Выход
+  - Результаты тестов (pass/fail)
+  - Coverage report
+  - Найденные баги
+  - Рекомендации
+```
 
 > `$ARGUMENTS` — название фичи для тестирования
 > Пример: `/test user login` → $ARGUMENTS = "user login"

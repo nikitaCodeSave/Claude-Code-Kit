@@ -1,8 +1,48 @@
 ---
 description: Реализует текущую задачу из .claude-workspace/current-task.md через строгий TDD. Использовать после одобрения плана.
-allowed-tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob
+allowed-tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob, Task
 ---
 # Implement Current Task
+
+## Интеграция с агентами
+
+**РЕКОМЕНДУЕТСЯ** использовать Task tool для делегирования code-agent:
+
+```
+[Task: code-agent]
+prompt: |
+  ## Задача: Реализация по плану
+
+  ### Контекст
+  - План: .claude-workspace/current-task.md
+  - Прогресс: .claude-workspace/progress.md
+
+  ### Инструкции
+  1. Прочитай план из current-task.md
+  2. Следуй TDD процессу для каждого шага
+  3. Атомарные коммиты после каждого шага
+  4. Обновляй progress.md
+
+  ### Ограничения
+  - Тесты ПЕРЕД кодом
+  - Один шаг = один коммит
+  - Код всегда в рабочем состоянии
+```
+
+**Автоопределение структуры проекта:**
+
+```bash
+# Определить директорию для исходников
+if [ -d "src" ]; then SOURCE_DIR="src"
+elif [ -d "lib" ]; then SOURCE_DIR="lib"
+elif [ -d "app" ]; then SOURCE_DIR="app"
+else SOURCE_DIR="src" && mkdir -p src
+fi
+
+# Тесты ВСЕГДА в tests/
+TEST_DIR="tests"
+mkdir -p $TEST_DIR
+```
 
 Реализуй задачу из `.claude-workspace/current-task.md` следуя TDD.
 

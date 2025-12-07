@@ -10,6 +10,7 @@
 | `/create-plan [feature]` | Планирование фичи | Перед реализацией > 50 LOC |
 | `/implement` | Реализация по плану | После одобрения плана |
 | `/code-review` | Код-ревью | После реализации |
+| `/complete-task` | Завершение задачи | После APPROVED ревью |
 | `/test [feature]` | Тестирование | После реализации |
 | `/quick-fix [bug]` | Быстрый fix | Для мелких багов < 20 LOC |
 | `/project-status` | Статус проекта | В любое время |
@@ -278,7 +279,73 @@ Step 2/5: Create auth middleware
 
 - **Агент:** `review-agent`
 - **До:** `/implement`
-- **После:** merge или fix → `/code-review staged`
+- **После:** `/complete-task` (если APPROVED) или fix → `/code-review staged`
+
+---
+
+## /complete-task
+
+**Файл:** `.claude/commands/complete-task.md`
+
+### Описание
+
+Завершает текущую задачу: архивирует план, обновляет features.json, очищает workspace для следующей задачи.
+
+### Когда использовать
+
+- После получения APPROVED вердикта от `/code-review`
+- Когда задача полностью завершена и готова к merge
+- Перед началом работы над новой задачей
+
+### Аргументы
+
+Нет (работает с `current-task.md`)
+
+### Что делает
+
+1. **Валидация:**
+   - Проверяет наличие задачи в `current-task.md`
+   - Проверяет что все шаги отмечены как выполненные
+
+2. **Архивация:**
+   - Копирует `current-task.md` → `archive/YYYY-MM-DD-slug.md`
+   - Сохраняет полный план для истории
+
+3. **Обновление tracking:**
+   - Обновляет `features.json`: status → "done", completedAt, archivePath
+   - Добавляет запись [COMPLETED] в `progress.md`
+
+4. **Очистка:**
+   - Сбрасывает `current-task.md` на шаблон "No active task"
+
+### Пример использования
+
+```
+/complete-task
+
+# Выход:
+## Task Completed
+
+**Task:** JWT Authentication
+**Duration:** 2h 30m
+**Archived to:** archive/2024-01-15-jwt-authentication.md
+
+### Summary
+- 5 steps completed
+- 12 commits made
+- 3 files created, 2 modified
+
+### features.json Updated
+- Status: done
+- Completed at: 2024-01-15T14:30:00Z
+
+Ready for next task. Run `/create-plan [feature]` to start.
+```
+
+### Связанные
+
+- **До:** `/code-review` (APPROVED)
+- **После:** `/create-plan [next-feature]`
 
 ---
 

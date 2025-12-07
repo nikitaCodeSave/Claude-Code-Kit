@@ -33,6 +33,63 @@ cat pyproject.toml 2>/dev/null | grep -A5 "\[tool.pytest"
 curl -s --max-time 2 http://localhost:3000/health 2>/dev/null || echo "No dev server"
 ```
 
+## Project Structure Detection
+
+**ВСЕГДА** определяй структуру проекта перед созданием файлов:
+
+```bash
+# Определить директорию для исходников
+detect_source_dir() {
+  if [ -d "src" ]; then
+    SOURCE_DIR="src"
+  elif [ -d "lib" ]; then
+    SOURCE_DIR="lib"
+  elif [ -d "app" ]; then
+    SOURCE_DIR="app"
+  else
+    # Fallback: создать src/
+    SOURCE_DIR="src"
+    mkdir -p "$SOURCE_DIR"
+  fi
+  echo "$SOURCE_DIR"
+}
+
+# Определить директорию для тестов
+detect_test_dir() {
+  if [ -d "tests" ]; then
+    TEST_DIR="tests"
+  elif [ -d "test" ]; then
+    TEST_DIR="test"
+  elif [ -d "__tests__" ]; then
+    TEST_DIR="__tests__"
+  else
+    # Fallback: создать tests/
+    TEST_DIR="tests"
+    mkdir -p "$TEST_DIR"
+  fi
+  echo "$TEST_DIR"
+}
+
+# Использование
+SOURCE_DIR=$(detect_source_dir)
+TEST_DIR=$(detect_test_dir)
+
+echo "Source directory: $SOURCE_DIR"
+echo "Test directory: $TEST_DIR"
+```
+
+### Правила размещения файлов
+
+| Тип файла | Путь | Пример |
+|-----------|------|--------|
+| Production код | `$SOURCE_DIR/` | `src/services/auth.py` |
+| Тесты | `$TEST_DIR/` | `tests/test_auth.py` |
+| Config | корень проекта | `pyproject.toml` |
+| Types/Interfaces | `$SOURCE_DIR/types/` | `src/types/user.py` |
+| Utils/Helpers | `$SOURCE_DIR/utils/` | `src/utils/validators.py` |
+
+**НИКОГДА** не создавай файлы в корне проекта, если есть src/lib/app!
+
 ## Tool Usage Priority
 
 1. **Read** — ВСЕГДА читай файл перед редактированием

@@ -1,8 +1,51 @@
 ---
 description: Анализ и исправление GitHub issue по номеру. Использовать при упоминании номера issue или запросе исправить конкретный issue. Следует TDD подходу.
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
+allowed-tools: Read, Edit, Write, Bash, Grep, Glob, Task
 ---
 # Исправление GitHub Issue: $ARGUMENTS
+
+## Интеграция с агентами
+
+**РЕКОМЕНДУЕТСЯ** двухфазный подход с агентами:
+
+### Фаза 1: Анализ (lead-agent)
+
+```
+[Task: lead-agent]
+prompt: |
+  ## Задача: Анализ GitHub Issue #$ARGUMENTS
+
+  ### Инструкции
+  1. Получи детали issue через gh CLI
+  2. Исследуй проблему в codebase
+  3. Определи root cause
+  4. Спланируй исправление (файлы, изменения, тесты)
+
+  ### Выход
+  - Root cause анализ
+  - План исправления (< 30 мин работы)
+  - Риски
+```
+
+### Фаза 2: Реализация (code-agent)
+
+```
+[Task: code-agent]
+prompt: |
+  ## Задача: Реализация исправления Issue #$ARGUMENTS
+
+  ### Контекст
+  - План из Фазы 1
+  - Issue details
+
+  ### Процесс (TDD)
+  1. Создай ветку fix/issue-$ARGUMENTS
+  2. Напиши тест воспроизводящий баг
+  3. Исправь код
+  4. Проверь все тесты
+  5. Коммит с "Fixes #$ARGUMENTS"
+  6. Создай PR через gh
+```
 
 > `$ARGUMENTS` — номер issue
 > Пример: `/fix-issue 123` → $ARGUMENTS = "123"

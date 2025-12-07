@@ -1,8 +1,38 @@
 ---
 description: Создаёт детальный план реализации фичи или задачи. Использовать при упоминании "plan", "design", "architect", или перед реализацией фич > 50 строк кода.
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash, Task, WebSearch
 ---
 # Планирование фичи/задачи: $ARGUMENTS
+
+## Интеграция с агентами
+
+**РЕКОМЕНДУЕТСЯ** использовать Task tool для делегирования lead-agent:
+
+```
+[Task: lead-agent]
+prompt: |
+  ## Задача: Планирование "$ARGUMENTS"
+
+  ### Контекст
+  - Прочитай .claude-workspace/current-task.md
+  - Прочитай .claude-workspace/progress.md
+  - Изучи структуру проекта
+
+  ### Требования
+  $ARGUMENTS
+
+  ### Выход
+  - Детальный план в формате из .claude/agents/lead-agent.md
+  - Оценка сложности (S/M/L/XL)
+  - Риски и митигации
+```
+
+**WebSearch** для актуальных библиотек:
+
+Если задача требует выбора библиотек/технологий, используй WebSearch:
+- "best [technology] library 2024"
+- "[framework] recommended packages"
+- "[task type] best practices 2024"
 
 > `$ARGUMENTS` — описание задачи после команды
 > Пример: `/create-plan user authentication` → $ARGUMENTS = "user authentication"
