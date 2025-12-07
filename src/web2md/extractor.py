@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 import trafilatura
-from readability import Document
+from readability import Document  # type: ignore[import-untyped]
 
 from web2md.exceptions import ExtractionError
 

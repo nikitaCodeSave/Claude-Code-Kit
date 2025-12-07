@@ -1,12 +1,18 @@
+#!/usr/bin/env python3
 """web2md CLI module.
 
 Command-line interface for web2md.
 """
 
-import argparse
-import logging
 import sys
 from pathlib import Path
+
+# Allow running as script: python src/web2md/cli.py
+if __name__ == "__main__":
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import argparse
+import logging
 from typing import Sequence
 
 from web2md.core import url_to_markdown
@@ -129,3 +135,7 @@ def run() -> None:
     """
     exit_code = main()
     sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    run()

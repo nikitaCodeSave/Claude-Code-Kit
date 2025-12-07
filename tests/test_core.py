@@ -1,8 +1,7 @@
 """Tests for web2md core module."""
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from web2md.core import url_to_markdown
 from web2md.exceptions import FetchError, ExtractionError, ConversionError

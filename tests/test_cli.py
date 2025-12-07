@@ -2,8 +2,7 @@
 
 import pytest
 import sys
-from io import StringIO
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from web2md.cli import parse_args, main, run
 from web2md.exceptions import FetchError, ExtractionError, ConversionError
@@ -223,9 +222,9 @@ class TestVerboseMode:
 
         main(["https://example.com"])
 
-        captured = capsys.readouterr()
-        # stderr should be empty or minimal without verbose
-        # (stdout will have the markdown output)
+        out, err = capsys.readouterr()
+        # stderr should be empty without verbose
+        assert err == ""
 
 
 class TestMetadataFlag:

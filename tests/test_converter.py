@@ -1,6 +1,5 @@
 """Tests for web2md converter module."""
 
-import pytest
 
 from web2md.converter import html_to_markdown, format_document
 from web2md.extractor import ExtractedContent

@@ -1,0 +1,16 @@
+{
+  "project": "Claude-Code-Kit",
+  "lastUpdated": "2025-12-07T22:15:00Z",
+  "features": [
+    {
+      "id": "F001",
+      "name": "Web Page to Markdown Parser",
+      "slug": "web2md",
+      "status": "implemented",
+      "priority": "1",
+      "description": "Python CLI утилита для загрузки веб-страниц, извлечения основного контента и конвертации в Markdown",
+      "createdAt": "2025-12-07T21:30:00Z",
+      "updatedAt": "2025-12-07T22:15:00Z"
+    }
+  ]
+}
