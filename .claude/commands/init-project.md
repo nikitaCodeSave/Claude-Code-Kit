@@ -47,12 +47,6 @@ if [ -d ".claude-workspace" ]; then
   echo "WORKSPACE_EXISTS"
   ls -la .claude-workspace/
 fi
-
-# Проверить CLAUDE.md
-if [ -f "CLAUDE.md" ]; then
-  echo "CLAUDE_MD_EXISTS"
-  head -20 CLAUDE.md
-fi
 ```
 
 **Если `WORKSPACE_EXISTS`:**
@@ -68,54 +62,21 @@ fi
 >
 > **Дождаться ответа пользователя. НЕ продолжать автоматически.**
 
-**Если `CLAUDE_MD_EXISTS`:**
-> **CLAUDE.md уже существует.**
->
-> Проверю секции и предложу дополнить если нужно (ШАГ 5).
-
 ---
 
-## ШАГ 2: Анализ проекта
+## ШАГ 2: Определение проекта
 
 ```bash
-echo "=== Анализ проекта ==="
+echo "=== Проект ==="
+PROJECT_NAME=$(basename $(pwd))
+echo "Проект: $PROJECT_NAME"
 
-# Определить tech stack
-if [ -f "package.json" ]; then
-  TECH_STACK="nodejs"
-  PROJECT_NAME=$(cat package.json | jq -r '.name // "unknown"')
-  echo "Node.js: $PROJECT_NAME"
-elif [ -f "pyproject.toml" ]; then
-  TECH_STACK="python"
-  PROJECT_NAME=$(grep "^name" pyproject.toml | head -1 | cut -d'"' -f2)
-  echo "Python: $PROJECT_NAME"
-elif [ -f "requirements.txt" ]; then
-  TECH_STACK="python-legacy"
-  PROJECT_NAME=$(basename $(pwd))
-  echo "Python (legacy): $PROJECT_NAME"
-elif [ -f "Cargo.toml" ]; then
-  TECH_STACK="rust"
-  PROJECT_NAME=$(grep "^name" Cargo.toml | head -1 | cut -d'"' -f2)
-  echo "Rust: $PROJECT_NAME"
-elif [ -f "go.mod" ]; then
-  TECH_STACK="go"
-  PROJECT_NAME=$(head -1 go.mod | cut -d' ' -f2)
-  echo "Go: $PROJECT_NAME"
-else
-  TECH_STACK="unknown"
-  PROJECT_NAME=$(basename $(pwd))
-  echo "Unknown stack: $PROJECT_NAME"
-fi
-
-# Определить структуру (tree может отсутствовать — это нормально)
 echo ""
 echo "=== Структура ==="
 tree -L 2 -I 'node_modules|__pycache__|.git|.venv|venv|dist|build' 2>/dev/null || ls -la
 ```
 
-Сохранить результаты для использования в следующих шагах:
-- `TECH_STACK` — тип проекта
-- `PROJECT_NAME` — название проекта
+Сохранить `PROJECT_NAME` для использования в следующих шагах.
 
 ---
 
@@ -153,7 +114,6 @@ ls -la .claude/
 
 ## [DATE] - INIT: Инициализация проекта
 - Создана структура .claude-workspace
-- Tech stack: [TECH_STACK]
 - Готов к разработке
 
 ---
@@ -166,7 +126,6 @@ ls -la .claude/
 ```json
 {
   "project": "[PROJECT_NAME]",
-  "techStack": "[TECH_STACK]",
   "lastUpdated": "[ISO_DATE]",
   "features": []
 }
@@ -225,50 +184,26 @@ ls -la .claude/
 
 ---
 
-## ШАГ 5: Создание/Проверка CLAUDE.md
-
-### Если CLAUDE.md не существует
-
-Создать базовый файл:
-
-```markdown
-# [PROJECT_NAME]
-
-## Tech Stack
-- [TECH_STACK определённый в ШАГ 2]
-
-## Команды
-[Автоопределение из package.json / pyproject.toml]
-
-## Структура проекта
-[Краткое описание основных директорий]
-
-## Стиль кода
-[Из .editorconfig / prettier / ruff если есть]
-
-## Важные заметки
-- Workspace: `.claude-workspace/`
-- Текущая задача: `.claude-workspace/current-task.md`
-```
-
-### Если CLAUDE.md существует
-
-Проверить наличие обязательных секций:
+## ШАГ 5: Проверка CLAUDE.md
 
 ```bash
-echo "=== Проверка секций CLAUDE.md ==="
-grep -q "## Tech Stack" CLAUDE.md 2>/dev/null && echo "OK Tech Stack" || echo "MISSING Tech Stack"
-grep -q "## Команды" CLAUDE.md 2>/dev/null && echo "OK Команды" || echo "MISSING Команды"
-grep -q "## Структура" CLAUDE.md 2>/dev/null && echo "OK Структура" || echo "MISSING Структура"
+if [ -f "CLAUDE.md" ]; then
+  echo "CLAUDE_MD_EXISTS"
+else
+  echo "NO_CLAUDE_MD"
+fi
 ```
 
-**Если секции отсутствуют:**
-> **В CLAUDE.md отсутствуют секции:**
-> - [список отсутствующих]
+**Если `CLAUDE_MD_EXISTS`:**
+> CLAUDE.md найден. Продолжаю.
+
+**Если `NO_CLAUDE_MD`:**
+> **CLAUDE.md не найден.**
 >
-> **Добавить недостающие секции?** (да/нет)
+> Рекомендую запустить `/init` после завершения инициализации —
+> он проанализирует проект и создаст качественное описание.
 >
-> При подтверждении — дополнить файл шаблонами секций.
+> Продолжаю без CLAUDE.md.
 
 ---
 
@@ -302,7 +237,13 @@ check_file ".claude-workspace/progress.md"
 check_file ".claude-workspace/features.json"
 check_file ".claude-workspace/current-task.md"
 check_file ".claude-workspace/decisions.md"
-check_file "CLAUDE.md"
+
+# CLAUDE.md опционален
+if [ -f "CLAUDE.md" ]; then
+  echo "OK CLAUDE.md"
+else
+  echo "INFO CLAUDE.md не найден — запустите /init для создания"
+fi
 
 # Проверить settings
 if [ -f ".claude/settings.json" ] || [ -f ".claude/settings.local.json" ]; then
@@ -349,7 +290,7 @@ fi
 
 **При подтверждении:**
 ```bash
-git add .claude-workspace/ .claude/ CLAUDE.md .gitignore
+git add .claude-workspace/ .claude/ .gitignore
 git commit -m "chore: initialize Claude Code workspace
 
 - Add .claude-workspace/ tracking files
@@ -365,7 +306,6 @@ git commit -m "chore: initialize Claude Code workspace
 ## Проект инициализирован
 
 **Проект:** [PROJECT_NAME]
-**Tech Stack:** [TECH_STACK]
 **Дата:** [DATE]
 
 ---
@@ -389,7 +329,7 @@ git commit -m "chore: initialize Claude Code workspace
 
 | Файл | Статус |
 |------|--------|
-| CLAUDE.md | Создан / Существовал |
+| CLAUDE.md | Существует / Нет (запустите /init) |
 | .gitignore | Обновлён |
 | settings.json | Есть / Нет |
 
@@ -403,7 +343,7 @@ git commit -m "chore: initialize Claude Code workspace
 
 ## Следующие шаги
 
-1. **Проверьте CLAUDE.md** — дополните информацией о проекте
+1. **Создайте CLAUDE.md** — запустите `/init` если файл отсутствует
 2. **Запустите `/project-status`** — убедитесь что всё работает
 3. **Начните разработку** — `/create-plan [первая фича]`
 
@@ -442,6 +382,5 @@ git commit -m "chore: initialize Claude Code workspace
 | Нет прав записи | 0 | СТОП, сообщить пользователю |
 | Не git repo | 0 | Спросить: init или продолжить |
 | Workspace существует | 1 | Спросить: skip/merge/overwrite |
-| CLAUDE.md существует | 1 | Сохранить, предложить дополнить |
 | Файл не создался | 7 | Повторить создание |
 | Git commit failed | 8 | Предупредить, продолжить |

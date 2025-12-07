@@ -50,9 +50,6 @@ cat .claude-workspace/current-task.md 2>/dev/null | head -10
 
 # 2. Недавние изменения (возможная причина бага)
 git diff --stat HEAD~3 2>/dev/null | head -10
-
-# 3. Tech stack
-cat pyproject.toml 2>/dev/null | head -10 || cat package.json 2>/dev/null | head -10
 ```
 
 ## Критерии быстрого исправления

@@ -92,10 +92,7 @@ cat .claude-workspace/current-task.md 2>/dev/null || echo "ERROR: No plan. Run /
 # 2. Git status
 git status --short 2>/dev/null
 
-# 3. Tech stack
-cat pyproject.toml 2>/dev/null | head -15 || cat package.json 2>/dev/null | head -15
-
-# 4. Baseline тесты
+# 3. Baseline тесты
 pytest --co -q 2>/dev/null | tail -5 || echo "No tests found"
 ```
 

@@ -21,14 +21,10 @@ cat .claude-workspace/current-task.md 2>/dev/null
 find . -path ./node_modules -prune -o -path ./.git -prune -o \
        \( -name "README*" -o -name "*.md" \) -print 2>/dev/null | head -20
 
-# 3. Tech stack (для правильных примеров)
-cat pyproject.toml 2>/dev/null | head -25 || \
-cat package.json 2>/dev/null | jq '.name, .description'
-
-# 4. Стиль существующих docs
+# 3. Стиль существующих docs
 head -50 README.md 2>/dev/null || head -50 docs/index.md 2>/dev/null
 
-# 5. Что изменилось (для CHANGELOG)
+# 4. Что изменилось (для CHANGELOG)
 git log --oneline -10 2>/dev/null
 ```
 

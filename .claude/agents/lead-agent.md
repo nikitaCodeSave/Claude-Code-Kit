@@ -26,11 +26,7 @@ cat .claude-workspace/progress.md 2>/dev/null | head -30
 git status --short
 git log --oneline -10
 
-# 4. Tech stack
-cat package.json 2>/dev/null | jq '.scripts, .dependencies | keys' || \
-cat pyproject.toml 2>/dev/null | head -30
-
-# 5. Структура проекта
+# 4. Структура проекта
 find . -type f -name "*.ts" -o -name "*.py" -o -name "*.go" | head -30 | xargs dirname | sort -u
 ```
 
