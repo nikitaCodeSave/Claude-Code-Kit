@@ -27,15 +27,43 @@ prompt: |
   - Риски и митигации
 ```
 
-**WebSearch** для актуальных библиотек:
+**WebSearch** для актуальной информации:
 
-Если задача требует выбора библиотек/технологий, используй WebSearch:
-- "best [technology] library 2024"
-- "[framework] recommended packages"
-- "[task type] best practices 2024"
+Когда использовать:
+- Выбор между технологиями/библиотеками/подходами
+- Незнакомая предметная область
+- Нужны современные best practices
+- Сравнение архитектурных решений
+
+НЕ использовать когда:
+- Простой багфикс или рефакторинг
+- Паттерн уже установлен в проекте
+- Задача в рамках существующего кода
+
+Примеры запросов (БЕЗ привязки к году):
+- "[задача] best practices"
+- "[подход A] vs [подход B] comparison"
+- "[технология] common issues"
+- "Python [задача] popular libraries"
 
 > `$ARGUMENTS` — описание задачи после команды
 > Пример: `/create-plan user authentication` → $ARGUMENTS = "user authentication"
+
+**Формат выбора решений** (применять для любых решений):
+
+Когда есть несколько способов решения (библиотеки, архитектура, подходы):
+
+1. **Рекомендация** (выделенная):
+   > Рекомендую: [решение] — [краткое обоснование в 1 предложении]
+
+2. **Альтернативы** (если есть значимые):
+   - Вариант B: [описание] — [когда лучше подходит]
+   - Вариант C: [описание] — [для каких случаев]
+
+3. **Продолжение:**
+   > Продолжаю с [рекомендацией]. Скажите если хотите другой вариант.
+
+Применять к: библиотекам, архитектурным паттернам, подходам к реализации, структуре кода.
 
 Создай детальный план для задачи. **НЕ ПИШИ КОД.**
 
@@ -86,16 +114,32 @@ cat .claude-workspace/features.json 2>/dev/null | head -20
 
 ```bash
 # Изучи структуру проекта
-tree -L 2 -I 'node_modules|__pycache__|.git|.venv|venv' | head -40
-
-# Python: найти сервисы/классы
-rg "class.*Service|class.*Handler|class.*Manager" --type py -l | head -10
-
-# Python: найти эндпоинты FastAPI/Flask
-rg "@(app|router)\.(get|post|put|delete|patch)" --type py -C 2 | head -30
+tree -L 2 -I 'node_modules|__pycache__|.git|.venv|venv|dist|build' | head -40
 
 # Проверь существующие паттерны
 cat CLAUDE.md 2>/dev/null | head -50
+```
+
+**Для Python проектов:**
+```bash
+# Найти сервисы/классы
+rg "class.*Service|class.*Handler|class.*Manager" --type py -l | head -10
+
+# Найти эндпоинты FastAPI/Flask
+rg "@(app|router)\.(get|post|put|delete|patch)" --type py -C 2 | head -30
+```
+
+**Для TypeScript/JavaScript проектов:**
+```bash
+# Найти компоненты/хуки React
+rg "export (default )?(function|const) \w+" --type ts --type tsx -l | head -10
+
+# Найти API routes (Next.js, Express)
+rg "export (async )?function (GET|POST|PUT|DELETE|PATCH)" --type ts | head -20
+rg "router\.(get|post|put|delete|patch)" --type ts --type js | head -20
+
+# Найти сервисы/классы
+rg "export class \w+" --type ts | head -10
 ```
 
 ### 2. Глубокий анализ подхода
