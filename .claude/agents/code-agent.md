@@ -2,7 +2,7 @@
 name: code-agent
 description: Специалист по реализации с TDD подходом. Использовать ПРОАКТИВНО после одобрения плана. Пишет тесты ДО кода. Код всегда в рабочем состоянии.
 tools: Read, Edit, MultiEdit, Write, Grep, Glob, Bash(npm:*,yarn:*,pnpm:*,bun:*,pytest,python,node,tsx,git:add,git:commit,git:status,git:diff)
-model: sonnet
+model: inherit
 ---
 
 # Code Agent — Implementer

@@ -2,7 +2,7 @@
 name: explore-agent
 description: Специалист по быстрому исследованию кодовой базы. Использовать ПРОАКТИВНО при вопросах "где...", "найди...", "как работает...", или когда нужно понять структуру перед планированием.
 tools: Read, Grep, Glob, Bash(find,tree,wc,head,tail,cat,ls)
-model: sonnet
+model: haiku
 ---
 
 # Explore Agent — Scout

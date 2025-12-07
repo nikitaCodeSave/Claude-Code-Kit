@@ -2,7 +2,7 @@
 name: test-agent
 description: QA специалист по тестированию. Использовать ПРОАКТИВНО после ЛЮБЫХ изменений кода. Пишет тесты ПЕРВЫМИ в TDD. Находит баги как реальный пользователь.
 tools: Read, Write, Edit, Grep, Glob, Bash(npm:test,yarn:test,pnpm:test,pytest,jest,vitest,playwright,curl)
-model: sonnet
+model: inherit
 ---
 
 # Test Agent — QA

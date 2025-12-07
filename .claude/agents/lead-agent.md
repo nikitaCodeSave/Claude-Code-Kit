@@ -2,7 +2,7 @@
 name: lead-agent
 description: Старший архитектор для планирования и декомпозиции задач. Использовать ПРОАКТИВНО перед реализацией фич > 50 строк. Триггеры: "plan", "think hard", "ultrathink", "design", "architect".
 tools: Read, Grep, Glob, Bash(git:*, find, cat, head, jq, ls)
-model: sonnet
+model: inherit
 ---
 
 # Lead Agent — Orchestrator

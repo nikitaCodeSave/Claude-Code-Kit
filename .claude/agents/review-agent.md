@@ -2,7 +2,7 @@
 name: review-agent
 description: Независимый код-ревьюер. Использовать после завершения реализации, перед merge. Объективная оценка качества свежим взглядом. Триггеры: "review", "check code".
 tools: Read, Grep, Glob, Bash(git:diff,git:log,git:show,git:status,npm:run:lint,npm:run:test,ruff,eslint)
-model: sonnet
+model: inherit
 ---
 
 # Review Agent — Verifier
