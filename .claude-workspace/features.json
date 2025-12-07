@@ -1,7 +1,7 @@
 {
   "project": "Claude-Code-Kit",
   "description": "Template/toolkit for Claude Code workflows with agents, commands, and workspace structure",
-  "lastUpdated": "2025-12-06T12:00:00Z",
+  "lastUpdated": "2025-12-07T14:30:00Z",
   "features": [
     {
       "id": "F001",
@@ -51,6 +51,16 @@
       "status": "done",
       "priority": "2",
       "description": "Синхронизация с реальной структурой"
+    },
+    {
+      "id": "F008",
+      "name": "Улучшение Workflow (Фаза 8)",
+      "slug": "workflow-improvements",
+      "status": "in_progress",
+      "priority": "1",
+      "description": "/complete-task, интеграция агентов через Task tool, /review→/code-review, features.json tracking",
+      "createdAt": "2025-12-07T14:30:00Z",
+      "updatedAt": "2025-12-07T14:30:00Z"
     }
   ],
   "statusLegend": {
@@ -66,5 +76,17 @@
     "2": "High - should have",
     "3": "Medium - nice to have",
     "4": "Low - future consideration"
+  },
+  "fieldsDescription": {
+    "id": "Unique feature ID (F001, F002...)",
+    "name": "Human-readable feature name",
+    "slug": "URL-friendly name for archive (optional)",
+    "status": "Current status from statusLegend",
+    "priority": "Priority from priorityLegend",
+    "description": "Brief description of the feature",
+    "createdAt": "ISO timestamp when feature was planned (optional)",
+    "updatedAt": "ISO timestamp of last status change (optional)",
+    "completedAt": "ISO timestamp when marked done (optional)",
+    "archivePath": "Path to archived task file (optional)"
   }
 }

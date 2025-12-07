@@ -123,7 +123,7 @@ sequenceDiagram
     C-->>U: 📊 Тесты: 95% pass, 87% coverage
 
     Note over U,G: Фаза 5: Code Review
-    U->>C: /review
+    U->>C: /code-review
     C->>R: Делегировать review
     R->>R: git diff analysis
     R->>R: Security scan
@@ -173,7 +173,7 @@ flowchart TD
     TEST_RESULT -->|Нет| FIX_BUGS[Исправить баги]
     FIX_BUGS --> TEST
     
-    TEST_RESULT -->|Да| REVIEW[/review/]
+    TEST_RESULT -->|Да| REVIEW[/code-review/]
     
     REVIEW --> REVIEW_RESULT{Review<br/>пройден?}
     
@@ -359,7 +359,7 @@ sequenceDiagram
     participant R as 👀 Review Agent
     participant G as 📂 Git
 
-    U->>C: /review [scope]
+    U->>C: /code-review [scope]
     
     Note over C: scope: N commits | staged | branch | all
     
@@ -516,7 +516,7 @@ flowchart TD
     TYPE -->|Проверка| CHECK{Что проверить?}
     CHECK -->|Статус| STATUS[/project-status/]
     CHECK -->|Тесты| TEST[/test/]
-    CHECK -->|Код| REVIEW[/review/]
+    CHECK -->|Код| REVIEW[/code-review/]
     
     TYPE -->|Исследование| EXPLORE_Q[Задать вопрос в чате<br/>→ Explore Agent]
     

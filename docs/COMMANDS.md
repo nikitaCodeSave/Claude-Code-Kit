@@ -9,7 +9,7 @@
 | `/init-project` | Инициализация проекта | Один раз в начале |
 | `/create-plan [feature]` | Планирование фичи | Перед реализацией > 50 LOC |
 | `/implement` | Реализация по плану | После одобрения плана |
-| `/review` | Код-ревью | После реализации |
+| `/code-review` | Код-ревью | После реализации |
 | `/test [feature]` | Тестирование | После реализации |
 | `/quick-fix [bug]` | Быстрый fix | Для мелких багов < 20 LOC |
 | `/project-status` | Статус проекта | В любое время |
@@ -188,13 +188,13 @@ Step 2/5: Create auth middleware
 
 - **Агент:** `code-agent`
 - **До:** `/create-plan`
-- **После:** `/review`
+- **После:** `/code-review`
 
 ---
 
-## /review
+## /code-review
 
-**Файл:** `.claude/commands/review.md`
+**Файл:** `.claude/commands/code-review.md`
 
 ### Описание
 
@@ -209,7 +209,7 @@ Step 2/5: Create auth middleware
 ### Аргументы
 
 ```
-/review [scope]
+/code-review [scope]
 ```
 
 Варианты scope:
@@ -246,12 +246,12 @@ Step 2/5: Create auth middleware
 ### Пример использования
 
 ```
-/review
+/code-review
 
 # или
-/review 3        # последние 3 коммита
-/review staged   # только staged
-/review branch   # вся ветка
+/code-review 3        # последние 3 коммита
+/code-review staged   # только staged
+/code-review branch   # вся ветка
 ```
 
 ### Формат вывода
@@ -278,7 +278,7 @@ Step 2/5: Create auth middleware
 
 - **Агент:** `review-agent`
 - **До:** `/implement`
-- **После:** merge или fix → `/review staged`
+- **После:** merge или fix → `/code-review staged`
 
 ---
 
@@ -351,7 +351,7 @@ Step 2/5: Create auth middleware
 ### Связанные
 
 - **Агент:** `test-agent`
-- **До:** `/implement` или `/review`
+- **До:** `/implement` или `/code-review`
 
 ---
 
@@ -592,6 +592,6 @@ Touch event handler не был привязан.
                   │                         ┌────────┴────────┐
                   v                         v                 v
              ┌──────────┐            ┌──────────┐      ┌──────────┐
-             │ /review  │            │/quick-fix│      │/create-plan│
+             │/code-    │            │/quick-fix│      │/create-plan│
              └──────────┘            └──────────┘      └──────────┘
 ```

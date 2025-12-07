@@ -190,7 +190,7 @@ git log --oneline -5
 
 ## review-agent
 
-**Файл:** `.claude/agents/review-agent.md`
+**Файл:** `.claude/agents/review-agent.md` (вызывается через `/code-review`)
 
 ### Роль
 
@@ -202,7 +202,7 @@ git log --oneline -5
 
 ### Когда вызывается
 
-- Автоматически при `/review`
+- Автоматически при `/code-review`
 - Когда пользователь говорит: "review", "check code"
 - После завершения работы `code-agent`
 
