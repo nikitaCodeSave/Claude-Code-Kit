@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rostics Menu</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Rostics Menu</h1>
+      <p class="subtitle">Quick menu viewer</p>
+    </header>
+
+    <div class="search-container">
+      <input
+        type="text"
+        id="search-input"
+        class="search-input"
+        placeholder="Search dishes..."
+        autocomplete="off"
+      >
+    </div>
+
+    <nav class="categories" id="categories">
+      <!-- Categories will be populated by JavaScript -->
+    </nav>
+
+    <main class="menu-container" id="menu-container">
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading menu...</p>
+      </div>
+
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <p>No menu data available.</p>
+        <p class="hint">Visit <a href="https://rostics.ru/menu" target="_blank">rostics.ru/menu</a> to load the menu.</p>
+      </div>
+
+      <div class="menu-grid" id="menu-grid">
+        <!-- Menu items will be populated by JavaScript -->
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span class="cache-info" id="cache-info"></span>
+      <button class="refresh-btn" id="refresh-btn" title="Refresh menu">
+        Refresh
+      </button>
+    </footer>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
