@@ -93,7 +93,7 @@
       "status": "accepted",
       "date": "2025-12-20",
       "context": "9 slash commands create cognitive overhead. Many commands have overlapping functionality.",
-      "decision": "Consolidate into 4 commands: /plan, /implement, /review, /done",
+      "decision": "Consolidate into 4 commands: /plan-task, /implement, /review-task, /done",
       "consequences": {
         "positive": ["Simpler mental model", "Clear linear workflow"],
         "negative": ["Some specialized commands removed"]

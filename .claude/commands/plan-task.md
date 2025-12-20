@@ -3,7 +3,7 @@ description: Создаёт план реализации. Объединяет 
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch
 ---
 
-# /plan $ARGUMENTS
+# /plan-task $ARGUMENTS
 
 ## Режимы работы
 

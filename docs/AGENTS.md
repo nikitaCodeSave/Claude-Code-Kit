@@ -4,229 +4,107 @@
 
 ## Обзор агентов
 
-| Агент | Роль | Модель | Инструменты |
-|-------|------|--------|-------------|
-| `lead-agent` | Архитектор, планировщик | sonnet | Read, Grep, Glob, Bash(git:*) |
-| `code-agent` | Разработчик (TDD) | sonnet | Read, Edit, Write, Grep, Glob, Bash |
-| `review-agent` | Код-ревьюер | sonnet | Read, Grep, Glob, Bash(git, lint, test) |
-| `test-agent` | QA специалист | sonnet | Read, Write, Edit, Grep, Glob, Bash(test) |
-| `explore-agent` | Разведчик кодовой базы | haiku | Read, Grep, Glob, Bash(find, tree, ls) |
-| `doc-agent` | Документатор | sonnet | Read, Write, Edit, Grep, Glob, WebFetch |
+| Агент | Модель | Роль | Инструменты |
+|-------|--------|------|-------------|
+| `dev-agent` | sonnet | TDD разработчик | Read, Edit, Write, Grep, Glob, Bash |
+| `review-agent` | sonnet | Код-ревьюер | Read, Grep, Glob, Bash(git, lint, test) |
+| `explore-agent` | haiku | Разведчик кодовой базы | Read, Grep, Glob, Bash(find, tree, ls) |
+| `doc-agent` | sonnet | Документатор | Read, Write, Edit, Grep, Glob, WebFetch |
 
 ---
 
-## lead-agent
+## dev-agent
 
-**Файл:** `.claude/agents/lead-agent.md`
+**Файл:** `.claude/agents/dev-agent.md`
 
 ### Роль
 
-Старший софтверный архитектор, отвечающий за планирование и координацию работы.
+TDD разработчик, реализующий задачи из `state.json` полным циклом: тест → код → рефакторинг → коммит.
 
 ### Когда вызывается
 
-- Автоматически при `/create-plan`
-- Когда пользователь говорит: "create-plan", "think hard", "think harder", "ultrathink", "design", "architect"
-- Перед реализацией фичи > 50 LOC
+- Автоматически при `/implement`
+- После одобрения плана из `/plan-task`
 
-### Ответственности
+### Ключевые принципы
 
-1. Анализ requirements и user stories
-2. Декомпозиция на атомарные подзадачи (каждая < 30 минут)
-3. Определение приоритетов и зависимостей
-4. Создание детальных планов
-5. Оценка рисков и mitigation strategies
+**TDD Цикл:**
+```
+1. WRITE TEST (RED)    — тест описывает ожидаемое поведение, должен упасть
+2. WRITE CODE (GREEN)  — минимум кода для прохождения теста
+3. REFACTOR            — улучшение без изменения поведения
+4. COMMIT              — атомарный коммит (один шаг = один коммит)
+5. UPDATE state.json   — отметить шаг как выполненный
+```
 
 ### Context Discovery
 
 При вызове выполняет:
 ```bash
-cat CLAUDE.md | head -50
-cat .claude-workspace/current-task.md
-cat .claude-workspace/progress.md | head -30
+cat .claude-workspace/state.json | jq '.currentTask'
 git status --short
-git log --oneline -10
+git log --oneline -3
 ```
 
-### OODA Loop
-
-1. **Observe** — изучи требования, проверь существующий код
-2. **Orient** — что сделано? какие блокеры? какие паттерны?
-3. **Decide** — разбей на шаги, определи критерии успеха
-4. **Act** — запиши план в `current-task.md`
-
-### Формат вывода
-
-```markdown
-## Task: [Name]
-
-### Objective
-[crystal clear goal]
-
-### Complexity Assessment
-- Size: S/M/L/XL
-- Risk: Low/Medium/High
-- Estimated Steps: N
-
-### Implementation Steps
-1. [ ] Step 1: [Title]
-   - Files: `path/to/file`
-   - Changes: [what]
-   - Tests: [what]
-
-### Success Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-### Risks & Mitigations
-| Risk | Probability | Impact | Mitigation |
-```
-
-### Ограничения
-
-- **НИКОГДА** не пишет код (только планирует)
-- **НЕ** модифицирует файлы (read-only)
-- **НЕ** делает предположений (задаёт вопросы)
-- Каждый шаг должен быть завершаем за < 30 минут
-
-### Делегирование
-
-Может вызывать:
-- `explore-agent` — быстрый поиск в codebase
-- `test-agent` — определение test strategy
-- `review-agent` — проверка security-sensitive изменений
-
----
-
-## code-agent
-
-**Файл:** `.claude/agents/code-agent.md`
-
-### Роль
-
-Разработчик, реализующий код строго по плану с использованием TDD.
-
-### Когда вызывается
-
-- Автоматически при `/implement`
-- После одобрения плана от `lead-agent`
-
-### Ответственности
-
-1. Реализация кода по плану из `current-task.md`
-2. Написание тестов ПЕРЕД кодом (TDD)
-3. Атомарные коммиты
-4. Поддержание кода в рабочем состоянии
-
-### Context Discovery
-
-```bash
-cat .claude-workspace/current-task.md
-cat .claude-workspace/progress.md | head -30
-git status --short
-git log --oneline -5
-```
-
-### TDD Process
+### Формат коммитов
 
 ```
-1. WRITE TEST (RED)
-   - Тест описывает expected behavior
-   - Запусти: npm test / pytest
-   - Тест ДОЛЖЕН УПАСТЬ
+type(scope): description
 
-2. WRITE CODE (GREEN)
-   - Минимум кода для прохождения теста
-   - Запусти тест — ДОЛЖЕН ПРОЙТИ
+Types: feat, fix, refactor, test, docs, chore
 
-3. REFACTOR
-   - Улучши читаемость
-   - Убери дублирование
-   - Тесты ВСЁ ЕЩЁ проходят
+Example:
+feat(auth): add JWT token validation
 
-4. COMMIT
-   - git add .
-   - git commit -m "type(scope): description"
+- Add validate_token() function
+- Add tests for valid/invalid tokens
 
-5. UPDATE TRACKING
-   - Отметь шаг в current-task.md
-   - Добавь в progress.md
+Step 3/5 of F002
 ```
-
-### Приоритет инструментов
-
-1. **Read** — ВСЕГДА читай файл перед редактированием
-2. **Edit** > Write для существующих файлов
-3. **MultiEdit** для множественных изменений
-4. **Write** только для НОВЫХ файлов
-5. **Bash** только для тестов, linter, git, package manager
-
-### Clean State Checklist
-
-- [ ] Все тесты проходят
-- [ ] Нет linting errors
-- [ ] Нет `console.log` / `print` в production
-- [ ] Нет uncommitted changes
-- [ ] `progress.md` обновлён
-- [ ] `current-task.md` шаги отмечены
 
 ### Ограничения
 
 **ЗАПРЕЩЕНО:**
-- `rm -rf`, `sudo`, деструктивные команды
-- Доступ к `.env`, secrets, credentials
-- `git push` без разрешения
-- Модификация тестов чтобы "прошли"
-- Оставлять код в нерабочем состоянии
-- Пропускать шаги плана
+- Пропускать TDD цикл
+- Коммитить нерабочий код
+- Модифицировать тесты чтобы они "прошли"
+- Оставлять код без обновления state.json
 
 **ОБЯЗАТЕЛЬНО:**
 - Read файл ПЕРЕД Edit
-- Сохранять точные отступы
-- Тестировать по ходу
-- Атомарные коммиты
+- Тест сначала ПАДАЕТ, потом ПРОХОДИТ
+- Атомарные коммиты (один шаг = один коммит)
+- Обновлять state.json после КАЖДОГО шага
 
 ---
 
 ## review-agent
 
-**Файл:** `.claude/agents/review-agent.md` (вызывается через `/code-review`)
+**Файл:** `.claude/agents/review-agent.md`
 
 ### Роль
 
-Независимый код-ревьюер с "свежим взглядом".
+Независимый код-ревьюер с "свежим взглядом". Проверяет код как внешний reviewer, не зная деталей реализации.
+
+### Когда вызывается
+
+- Автоматически при `/review-task`
+- После завершения работы `dev-agent`
+- Перед merge в main ветку
 
 ### Ключевой принцип
 
 **Independence**: Проверяет код как ВНЕШНИЙ reviewer. Забывает детали реализации — смотрит свежим взглядом.
 
-### Когда вызывается
-
-- Автоматически при `/code-review`
-- Когда пользователь говорит: "review", "check code"
-- После завершения работы `code-agent`
-
-### Context Discovery
-
-```bash
-cat .claude-workspace/current-task.md
-git log --oneline -10
-git diff HEAD~5 --stat
-git show --stat HEAD~5..HEAD
-npm test 2>&1 | tail -30
-npm run lint 2>&1 | head -50
-```
-
 ### Auto-REJECT критерии
 
-| Finding | Severity | Action |
-|---------|----------|--------|
+| Находка | Severity | Действие |
+|---------|----------|----------|
 | Hardcoded secrets | CRITICAL | REJECT |
-| `console.log` в production | HIGH | REJECT |
 | SQL/Command injection | CRITICAL | REJECT |
-| Missing tests | HIGH | CHANGES REQUESTED |
-| Coverage decreased | HIGH | CHANGES REQUESTED |
-| Breaking changes без docs | HIGH | CHANGES REQUESTED |
+| `console.log` в production | HIGH | CHANGES REQUESTED |
+| Отсутствие тестов | HIGH | CHANGES REQUESTED |
+| Снижение coverage | HIGH | CHANGES REQUESTED |
 
 ### Security Patterns
 
@@ -250,51 +128,41 @@ rg "innerHTML|dangerouslySetInnerHTML|v-html"
 - [ ] Код делает то что заявлено
 - [ ] Логика корректна
 - [ ] Edge cases обработаны
-- [ ] Error handling присутствует
 
 **Code Quality:**
 - [ ] Читаемый код
 - [ ] Понятные имена
 - [ ] Нет дублирования (DRY)
-- [ ] Функции < 50 lines
+- [ ] Функции < 50 строк
 
 **Testing:**
 - [ ] Тесты существуют
 - [ ] Happy path покрыт
-- [ ] Edge cases покрыты
-- [ ] Error cases покрыты
+- [ ] Edge/error cases покрыты
 
 **Security:**
 - [ ] Нет hardcoded secrets
 - [ ] Input validation
 - [ ] Нет injection уязвимостей
 
-**Performance:**
-- [ ] Нет O(n²) где можно O(n)
-- [ ] Нет N+1 queries
-- [ ] Нет memory leaks
-
 ### Формат вывода
 
 ```markdown
-## Code Review: [Feature Name]
+## Code Review
 
-**Status:** APPROVED / CHANGES REQUESTED / REJECTED
-**Quality Score:** 4/5
+**Verdict:** APPROVED | CHANGES REQUESTED | REJECTED
+**Quality:** 4/5
 
-### Critical Findings
-1. [Title]
-   - File: `path:line`
-   - Issue: ...
-   - Risk: ...
-   - Fix: ...
+### Findings
+
+#### Critical (must fix)
+1. **[Title]** — `file:line` — [issue] — [solution]
 
 ### What's Good
-- ...
+- [положительные аспекты]
 
-### Before Merge Checklist
-- [ ] All findings addressed
-- [ ] Tests pass
+### Next Steps
+При APPROVED: Запустите `/done` для завершения задачи.
 ```
 
 ### Ограничения
@@ -303,132 +171,10 @@ rg "innerHTML|dangerouslySetInnerHTML|v-html"
 - Быть объективным
 - Объяснять ПОЧЕМУ что-то плохо
 - Предлагать конкретные решения
-- Приоритизировать findings
 
 **ЗАПРЕЩЕНО:**
 - Модифицировать файлы
-- Approve с CRITICAL findings
-- Быть unnecessarily harsh
-
----
-
-## test-agent
-
-**Файл:** `.claude/agents/test-agent.md`
-
-### Роль
-
-QA специалист, тестирующий как реальный пользователь.
-
-### Ключевой принцип
-
-**User Perspective**: Тестирует как реальный пользователь, НЕ как разработчик знающий код.
-
-### Когда вызывается
-
-- Автоматически при `/test`
-- После любых изменений кода
-- В TDD workflow для написания тестов FIRST
-
-### Context Discovery
-
-```bash
-cat .claude-workspace/current-task.md
-cat package.json | jq '.scripts.test'
-find . -name "*.test.*" -o -name "*.spec.*" | head -20
-```
-
-### TDD Process (Tests First)
-
-```
-1. Получи requirements/plan
-   - Что ДОЛЖНО работать?
-   - Какие inputs/outputs?
-
-2. Напиши тесты на expected behavior
-   - Happy path
-   - Edge cases
-   - Error cases
-
-3. Запусти тесты
-   - ДОЛЖНЫ УПАСТЬ
-   - Если проходят — тест невалидный
-
-4. Передай Code Agent
-```
-
-### Test Categories
-
-**Unit Tests:**
-- Тестируют ОДНУ функцию
-- Изолированы от зависимостей
-- Быстрые (< 100ms)
-- Используют mocks
-
-**Integration Tests:**
-- Тестируют взаимодействие компонентов
-- Могут использовать реальную DB
-- Медленнее unit тестов
-
-**E2E Tests:**
-- Тестируют полный user flow
-- Через реальный UI/API
-- Самые медленные, но ценные
-
-### Test Scenarios Matrix
-
-| Scenario | Input | Expected | Priority |
-|----------|-------|----------|----------|
-| Happy path | valid data | success | P0 |
-| Empty input | `""`, `[]`, `{}` | validation error | P0 |
-| Invalid format | wrong type | type error | P1 |
-| Boundary min | `0`, `""` | defined behavior | P1 |
-| Boundary max | `MAX_INT` | defined behavior | P1 |
-| Null/undefined | `null` | graceful handling | P1 |
-| Concurrent | parallel requests | no race conditions | P2 |
-| Network failure | timeout, 500 | retry or error | P2 |
-| Special chars | `<script>`, `'; DROP` | escaped | P1 |
-
-### Формат вывода
-
-```markdown
-## Test Results: [Feature]
-
-### Summary
-| Type | Total | Pass | Fail | Skip |
-|------|-------|------|------|------|
-| Unit | 15 | 14 | 1 | 0 |
-
-### Coverage
-- Lines: X%
-- Branches: Y%
-
-### Failed Tests
-1. `test_name`
-   - Expected: ...
-   - Actual: ...
-
-### Bugs Found
-1. [CRITICAL] Description
-   - Steps to reproduce: ...
-
-### Recommendations
-- [ ] Add test for ...
-```
-
-### Ограничения
-
-**ЗАПРЕЩЕНО:**
-- Изменять логику тестов без понимания intent
-- Добавлять `.only()` или `.skip()` в коммиты
-- Изменять код НЕ связанный с тестированием
-- Удалять failing tests
-
-**ОБЯЗАТЕЛЬНО:**
-- Тесты НЕЗАВИСИМЫ друг от друга
-- Каждый тест = один сценарий
-- Тестировать BEHAVIOR, не implementation
-- Descriptive test names
+- Approve код с CRITICAL findings
 
 ---
 
@@ -438,21 +184,21 @@ find . -name "*.test.*" -o -name "*.spec.*" | head -20
 
 ### Роль
 
-Эксперт по быстрой разведке кодовой базы.
-
-### Ключевой принцип
-
-**Speed over Depth**: Найти релевантную информацию максимально быстро. Ограничивать вывод.
+Эксперт по быстрой разведке кодовой базы. Находит нужную информацию максимально быстро.
 
 ### Когда вызывается
 
-- Когда пользователь спрашивает: "where is...", "find...", "how does X work", "show me..."
+- Когда пользователь спрашивает: "где...", "найди...", "как работает..."
 - Когда нужно понять структуру codebase
 - Перед планированием для сбора контекста
 
 ### Модель
 
 Использует **haiku** (быстрая, дешёвая модель) для скорости.
+
+### Ключевой принцип
+
+**Speed over Depth**: Найти релевантную информацию максимально быстро. Ограничивать вывод.
 
 ### Search Strategies
 
@@ -478,15 +224,6 @@ rg "^(async )?def $NAME|^class $NAME" -A 3
 **Структура проекта:**
 ```bash
 tree -L 2 -I 'node_modules|__pycache__|.git' | head -50
-```
-
-**API endpoints:**
-```bash
-# Express/Fastify
-rg "(app|router)\.(get|post|put|delete)\s*\("
-
-# FastAPI
-rg "@(app|router)\.(get|post|put|delete)"
 ```
 
 ### Response Guidelines
@@ -517,13 +254,11 @@ rg "@(app|router)\.(get|post|put|delete)"
 
 **ЗАПРЕЩЕНО:**
 - Модифицировать файлы
-- Читать целые большие файлы
+- Читать целые большие файлы (> 500 строк)
 - Выводить > 50 строк результатов
-- Команды изменяющие состояние
 
 **ОБЯЗАТЕЛЬНО:**
 - Ограничивать вывод (`head -20`)
-- Использовать `-l` для listing файлов
 - Исключать node_modules, .git
 - Краткий ответ (< 500 слов)
 - Если не нашёл — сказать прямо
@@ -536,12 +271,12 @@ rg "@(app|router)\.(get|post|put|delete)"
 
 ### Роль
 
-Специалист по технической документации.
+Специалист по технической документации. Создаёт понятную, актуальную документацию.
 
 ### Когда вызывается
 
 - Когда пользователь просит документировать код
-- Для создания README
+- Для создания/обновления README
 - После завершения major feature
 
 ### Documentation Types
@@ -550,13 +285,16 @@ rg "@(app|router)\.(get|post|put|delete)"
 2. **API Docs** — endpoint документация
 3. **Code Comments** — inline documentation
 4. **Architecture Docs** — system design
+5. **CHANGELOG** — история изменений
 
 ### Process
 
-1. Прочитай существующую документацию
-2. Изучи код который нужно документировать
-3. Определи аудиторию (developers, users, ops)
-4. Напиши документацию в соответствующем стиле
+1. **Read** — прочитай существующую документацию
+2. **Analyze** — определи что нужно документировать
+3. **Research** — изучи код который документируешь
+4. **Write** — напиши документацию
+5. **Verify** — проверь все примеры кода
+6. **Update** — обнови Table of Contents и ссылки
 
 ### Style Guidelines
 
@@ -565,60 +303,71 @@ rg "@(app|router)\.(get|post|put|delete)"
 - Документируй edge cases и ограничения
 - Используй consistent formatting
 
-### Output
-
-- Обновлённые/созданные `.md` файлы
-- Inline comments в коде
-- Changelog записи если нужно
-
 ### Ограничения
 
 **ЗАПРЕЩЕНО:**
-- Создавать документацию без изучения кода
-- Копировать код в документацию без объяснений
-- Игнорировать существующий стиль документации
+- Документировать неработающий код
+- Копировать docs без адаптации
+- Оставлять устаревшие примеры
 
 **ОБЯЗАТЕЛЬНО:**
 - Читать существующую документацию перед изменениями
-- Использовать consistent formatting
-- Включать примеры использования
+- Проверять все code snippets
+- Включать примеры error handling
 
 ---
 
 ## Взаимодействие агентов
 
 ```
-                    ┌─────────────┐
-                    │ lead-agent  │
-                    │ (планирует) │
-                    └──────┬──────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-         v                 v                 v
-┌────────────────┐ ┌────────────────┐ ┌────────────────┐
-│ explore-agent  │ │  code-agent    │ │  test-agent    │
-│ (разведка)     │ │ (реализация)   │ │ (тесты)        │
-└────────────────┘ └───────┬────────┘ └────────────────┘
-                           │
-                           v
-                   ┌────────────────┐
-                   │ review-agent   │
-                   │ (проверка)     │
-                   └───────┬────────┘
-                           │
-                           v
-                   ┌────────────────┐
-                   │  doc-agent     │
-                   │(документация)  │
-                   └────────────────┘
+                    ┌─────────────────┐
+                    │   /plan-task    │
+                    │  (планирование) │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              v              v              v
+     ┌────────────────┐            ┌────────────────┐
+     │ explore-agent  │            │  /implement    │
+     │ (разведка)     │            │                │
+     └────────────────┘            └───────┬────────┘
+                                           │
+                                           v
+                                  ┌────────────────┐
+                                  │  dev-agent     │
+                                  │ (TDD цикл)     │
+                                  └───────┬────────┘
+                                          │
+                                          v
+                                  ┌────────────────┐
+                                  │  /review-task  │
+                                  │                │
+                                  └───────┬────────┘
+                                          │
+                                          v
+                                  ┌────────────────┐
+                                  │ review-agent   │
+                                  │ (проверка)     │
+                                  └───────┬────────┘
+                                          │
+                                          v
+                                  ┌────────────────┐
+                                  │    /done       │
+                                  └───────┬────────┘
+                                          │
+                                          v
+                                  ┌────────────────┐
+                                  │  doc-agent     │
+                                  │(документация)  │
+                                  └────────────────┘
 ```
 
 ### Типичный flow
 
-1. **lead-agent** получает задачу, вызывает **explore-agent** для разведки
-2. **lead-agent** создаёт план, передаёт **code-agent**
-3. **code-agent** вызывает **test-agent** для написания тестов первым
-4. **code-agent** реализует код
-5. **review-agent** проверяет результат
-6. **doc-agent** обновляет документацию
+1. **explore-agent** вызывается для разведки перед планированием
+2. `/plan-task` создаёт план задачи
+3. `/implement` делегирует **dev-agent** для TDD реализации
+4. `/review-task` вызывает **review-agent** для проверки
+5. `/done` архивирует задачу
+6. **doc-agent** обновляет документацию (опционально)

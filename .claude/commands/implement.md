@@ -21,7 +21,7 @@ pytest --co -q 2>/dev/null | tail -5 || npm test -- --listTests 2>/dev/null | ta
 ```
 
 **Если currentTask == null:**
-> ERROR: Нет плана. Создайте с `/plan [feature]`.
+> ERROR: Нет плана. Создайте с `/plan-task [feature]`.
 
 ## ШАГ 2: Обновить статус
 
@@ -123,7 +123,7 @@ pytest --cov=src --cov-report=term-missing 2>/dev/null | tail -20
 ### Status: READY_FOR_REVIEW
 
 ### Next Steps
-- Запустите `/review` для код-ревью
+- Запустите `/review-task` для код-ревью
 ```
 
 ## Ограничения

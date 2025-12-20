@@ -21,7 +21,7 @@ git log --oneline -5
 ```
 
 **Если currentTask == null:**
-> ERROR: Нет активной задачи. Создайте с `/plan [feature]`.
+> ERROR: Нет активной задачи. Создайте с `/plan-task [feature]`.
 
 **Если есть незакоммиченные изменения:**
 > WARNING: Есть незакоммиченные изменения. Закоммитьте перед завершением.
@@ -158,7 +158,7 @@ git commit -m "chore(workspace): complete task [TASK_NAME]
 ---
 
 **Next Steps:**
-- `/plan [new feature]` — start new task
+- `/plan-task [new feature]` — start new task
 - `cat .claude-workspace/state.json | jq '.features'` — view all features
 ```
 

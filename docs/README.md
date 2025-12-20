@@ -1,6 +1,6 @@
 # Claude Code Kit
 
-Шаблонный проект для эффективной работы с Claude Code. Предоставляет структуру, агентов и slash-команды для организации разработки.
+Шаблонный проект для эффективной работы с Claude Code. Предоставляет структуру агентов, slash-команды и единую систему отслеживания состояния.
 
 ## Для кого этот проект
 
@@ -14,32 +14,32 @@
 
 ```bash
 # Клонируйте репозиторий
-git clone https://github.com/your-repo/claude-code-kit.git my-project
+git clone https://github.com/anthropics/claude-code-kit.git my-project
 cd my-project
 
-# Удалите историю git (начните с чистого листа)
-rm -rf .git
-git init
+# Или скопируйте только нужные директории в существующий проект
+cp -r claude-code-kit/.claude your-project/
+cp -r claude-code-kit/.claude-workspace your-project/
+cp claude-code-kit/CLAUDE.md your-project/
 ```
 
-### 2. Инициализируйте проект
+### 2. Начните работу
 
 ```bash
 # Запустите Claude Code
 claude
 
-# Выполните команду инициализации
-/init-project
-```
+# Создайте план для новой фичи
+/plan-task user authentication
 
-### 3. Начните работу
+# После одобрения — реализуйте
+/implement
 
-```bash
-# Проверьте статус
-/project-status
+# Код-ревью
+/review-task
 
-# Запланируйте первую фичу
-/create-plan my-first-feature
+# Завершите задачу
+/done
 ```
 
 ## Структура проекта
@@ -47,115 +47,108 @@ claude
 ```
 .
 ├── .claude/                    # Конфигурация Claude Code
-│   ├── agents/                 # Специализированные агенты
-│   │   ├── lead-agent.md       # Архитектор и планировщик
-│   │   ├── code-agent.md       # Разработчик (TDD)
+│   ├── agents/                 # Специализированные агенты (4)
+│   │   ├── dev-agent.md        # TDD разработчик
 │   │   ├── review-agent.md     # Код-ревьюер
-│   │   ├── test-agent.md       # QA специалист
-│   │   ├── explore-agent.md    # Исследователь кодовой базы
+│   │   ├── explore-agent.md    # Разведчик кодовой базы
 │   │   └── doc-agent.md        # Документатор
-│   ├── commands/               # Slash-команды
-│   │   ├── init-project.md     # Инициализация проекта
-│   │   ├── create-plan.md      # Планирование фичи
+│   ├── commands/               # Slash-команды (4)
+│   │   ├── plan-task.md        # Планирование задачи
 │   │   ├── implement.md        # Реализация по плану
-│   │   ├── code-review.md      # Код-ревью
-│   │   ├── test.md             # Тестирование
-│   │   ├── quick-fix.md        # Быстрые исправления
-│   │   ├── project-status.md   # Статус проекта
-│   │   └── fix-issue.md        # Исправление GitHub issues
-│   └── settings.local.json     # Локальные настройки (включает inline hooks)
+│   │   ├── review-task.md      # Код-ревью
+│   │   └── done.md             # Завершение задачи
+│   └── settings.local.json     # Permissions и hooks
 │
-├── .claude-workspace/          # Рабочие файлы отслеживания
-│   ├── progress.md             # Лог прогресса сессий
-│   ├── features.json           # Отслеживание фич
-│   ├── current-task.md         # Текущая задача
-│   └── decisions.md            # Архитектурные решения
+├── .claude-workspace/          # Рабочие файлы
+│   ├── state.json              # Единый файл состояния
+│   └── archive/                # Архив завершённых задач
 │
 ├── docs/                       # Документация
 │   ├── README.md               # Этот файл
-│   ├── WORKFLOW.md             # Workflow и процессы
+│   ├── WORKFLOW.md             # Процессы разработки
 │   ├── COMMANDS.md             # Справка по командам
 │   └── AGENTS.md               # Справка по агентам
 │
 └── CLAUDE.md                   # Основные инструкции для Claude
 ```
 
-## Ключевые концепции
+## Workflow
 
-### OODA Loop
+Линейный процесс разработки:
 
-Все агенты работают по методологии OODA:
-- **Observe** — собери информацию
-- **Orient** — оцени ситуацию
-- **Decide** — прими решение
-- **Act** — действуй
+```
+/plan-task → (approve) → /implement → /review-task → /done → merge
+```
 
-### TDD Workflow
+### Основные команды
 
-Разработка ведётся по принципу Test-Driven Development:
-1. Напиши тест (RED)
-2. Напиши код (GREEN)
-3. Рефактори (REFACTOR)
-4. Закоммить
-
-### Атомарные изменения
-
-- Каждый шаг плана — отдельный коммит
-- Каждый шаг выполним за < 30 минут
-- Код всегда в рабочем состоянии
-
-## Основные команды
-
-| Команда | Описание |
-|---------|----------|
-| `/init-project` | Инициализировать проект |
-| `/project-status` | Показать текущий статус проекта |
-| `/create-plan [feature]` | Создать план реализации фичи |
-| `/implement` | Реализовать текущую задачу |
-| `/code-review` | Провести код-ревью |
-| `/test [feature]` | Протестировать фичу |
-| `/quick-fix [bug]` | Быстро исправить баг |
-| `/fix-issue [#N]` | Исправить GitHub issue |
+| Команда | Когда использовать |
+|---------|-------------------|
+| `/plan-task [feature]` | Перед реализацией. Флаги: `--quick`, `--issue N` |
+| `/implement` | После одобрения плана |
+| `/review-task` | После реализации, перед merge |
+| `/done` | После APPROVED ревью |
 
 Подробнее: [COMMANDS.md](./COMMANDS.md)
 
-## Агенты
+### Агенты
 
-| Агент | Роль |
-|-------|------|
-| `lead-agent` | Планирование и декомпозиция задач |
-| `code-agent` | Реализация кода по TDD |
-| `review-agent` | Независимая проверка кода |
-| `test-agent` | QA и тестирование |
-| `explore-agent` | Быстрый поиск в кодовой базе |
-| `doc-agent` | Создание документации |
+| Агент | Модель | Роль |
+|-------|--------|------|
+| `dev-agent` | sonnet | TDD разработка: RED → GREEN → REFACTOR → COMMIT |
+| `review-agent` | sonnet | Независимый код-ревью |
+| `explore-agent` | haiku | Быстрая разведка по кодовой базе |
+| `doc-agent` | sonnet | Документация |
 
 Подробнее: [AGENTS.md](./AGENTS.md)
 
-## Workflow
+## state.json
+
+Единый файл состояния заменяет множество отдельных файлов:
+
+```json
+{
+  "project": "project-name",
+  "currentTask": {
+    "id": "F001",
+    "name": "Feature name",
+    "status": "planned|in_progress|review|done",
+    "complexity": "S|M|L|XL",
+    "steps": [
+      {"id": 1, "name": "Step 1", "completed": false}
+    ]
+  },
+  "features": [
+    {"id": "F001", "name": "Feature", "status": "done"}
+  ],
+  "progress": [
+    {"timestamp": "...", "type": "PLAN|IMPLEMENT|REVIEW|COMPLETE", "message": "..."}
+  ],
+  "decisions": [
+    {"id": "ADR-001", "title": "Decision", "decision": "..."}
+  ]
+}
+```
+
+## TDD Workflow
+
+Разработка ведётся по Test-Driven Development:
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│/create-plan │ -> │ /implement  │ -> │/code-review │
-│  (lead)     │    │   (code)    │    │  (review)   │
-└─────────────┘    └─────────────┘    └─────────────┘
-      │                  │                  │
-      v                  v                  v
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ current-    │    │   Commits   │    │  Approve/   │
-│ task.md     │    │  (atomic)   │    │  Request    │
-└─────────────┘    └─────────────┘    └─────────────┘
+1. WRITE TEST (RED)    — тест должен упасть
+2. WRITE CODE (GREEN)  — минимум кода для прохождения
+3. REFACTOR            — улучшение без изменения поведения
+4. COMMIT              — атомарный коммит
+5. UPDATE state.json   — отметить шаг как выполненный
 ```
-
-Подробнее: [WORKFLOW.md](./WORKFLOW.md)
 
 ## Правила работы
 
-1. **ВСЕГДА** читайте `progress.md` в начале сессии
-2. **ВСЕГДА** обновляйте `progress.md` после завершения работы
-3. Работайте над **ОДНОЙ** фичей за раз
-4. Используйте `/create-plan` для фич > 50 строк кода
-5. Используйте `/code-review` после завершения реализации
+1. **НАЧАЛО сессии**: прочитай `state.json` для контекста
+2. **КОНЕЦ сессии**: обнови `state.json` с результатами
+3. Работай над **ОДНОЙ** задачей за раз
+4. Используй `/plan-task` для задач > 50 строк кода
+5. Используй `/review-task` после реализации, перед merge
 
 ## Документация
 
