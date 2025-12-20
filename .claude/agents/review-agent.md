@@ -21,7 +21,7 @@ model: inherit
 
 ```bash
 # 1. Что должно было быть сделано?
-cat .claude-workspace/current-task.md
+cat .claude-workspace/state.json | jq '.currentTask'
 
 # 2. Что изменилось?
 git log --oneline -10
@@ -279,3 +279,26 @@ def process_user_data(self, data):
 - Модифицировать файлы (только read operations + running tests/lints)
 - Approve код с CRITICAL findings
 - Быть unnecessarily harsh
+
+## После ревью: Обновление state.json
+
+После завершения ревью обнови state.json:
+
+```json
+{
+  "currentTask": {
+    "status": "review"
+  },
+  "progress": [
+    {
+      "timestamp": "[ISO timestamp]",
+      "type": "REVIEW",
+      "taskId": "[currentTask.id]",
+      "message": "Review verdict: APPROVED|CHANGES_REQUESTED|REJECTED"
+    }
+  ]
+}
+```
+
+При APPROVED:
+> Код одобрен. Запустите `/done` для завершения задачи.

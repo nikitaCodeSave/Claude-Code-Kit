@@ -1,0 +1,45 @@
+{
+  "project": "Claude-Code-Kit",
+  "version": "2.0",
+  "currentTask": null,
+  "features": [],
+  "progress": [],
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "title": "Use JSON for state tracking",
+      "status": "accepted",
+      "date": "2025-12-20",
+      "context": "Anthropic recommends JSON over Markdown for state tracking - models are less likely to inappropriately modify JSON files",
+      "decision": "Use single state.json file instead of multiple Markdown files (progress.md, current-task.md, decisions.md, features.json)",
+      "consequences": {
+        "positive": ["Single source of truth", "Machine-readable", "Less prone to corruption"],
+        "negative": ["Requires migration from old format"]
+      }
+    },
+    {
+      "id": "ADR-002",
+      "title": "Merge code-agent and test-agent into dev-agent",
+      "status": "accepted",
+      "date": "2025-12-20",
+      "context": "TDD workflow naturally combines test writing and code implementation. Anthropic uses single coding agent.",
+      "decision": "Create unified dev-agent that handles full TDD cycle: RED -> GREEN -> REFACTOR -> COMMIT",
+      "consequences": {
+        "positive": ["Simpler workflow", "Less context switching", "Fewer files"],
+        "negative": ["Larger single agent prompt"]
+      }
+    },
+    {
+      "id": "ADR-003",
+      "title": "Reduce commands from 9 to 4",
+      "status": "accepted",
+      "date": "2025-12-20",
+      "context": "9 slash commands create cognitive overhead. Many commands have overlapping functionality.",
+      "decision": "Consolidate into 4 commands: /plan, /implement, /review, /done",
+      "consequences": {
+        "positive": ["Simpler mental model", "Clear linear workflow"],
+        "negative": ["Some specialized commands removed"]
+      }
+    }
+  ]
+}
