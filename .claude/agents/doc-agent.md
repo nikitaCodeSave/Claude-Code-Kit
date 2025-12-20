@@ -15,7 +15,7 @@ model: inherit
 
 ```bash
 # 1. Текущая задача
-cat .claude-workspace/current-task.md 2>/dev/null
+cat .claude-workspace/state.json | jq '.currentTask' 2>/dev/null
 
 # 2. Существующая документация
 find . -path ./node_modules -prune -o -path ./.git -prune -o \
@@ -179,7 +179,7 @@ response = requests.post(
 4. Ответ возвращается клиенту
 
 ## Key Decisions
-См. [decisions.md](decisions.md) для ADR записей
+См. `.claude-workspace/state.json` секция `decisions[]` для ADR записей
 ```
 
 ### 4. Code Comments — Inline documentation
