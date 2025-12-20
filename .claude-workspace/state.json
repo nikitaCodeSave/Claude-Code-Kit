@@ -2,8 +2,66 @@
   "project": "Claude-Code-Kit",
   "version": "2.0",
   "currentTask": null,
-  "features": [],
-  "progress": [],
+  "features": [
+    {
+      "id": "F001",
+      "name": "Rostics Menu Assistant",
+      "status": "done",
+      "priority": 1,
+      "completedAt": "2025-12-20T19:00:00Z",
+      "archivePath": ".claude-workspace/archive/2025-12-20-rostics-menu-assistant.md"
+    }
+  ],
+  "progress": [
+    {
+      "timestamp": "2025-12-20T12:00:00Z",
+      "type": "PLAN",
+      "taskId": "F001",
+      "message": "Created plan: Rostics Menu Assistant Chrome Extension"
+    },
+    {
+      "timestamp": "2025-12-20T18:50:00Z",
+      "type": "IMPLEMENT",
+      "taskId": "F001",
+      "message": "Completed step 1/5: Setup Chrome Extension with Manifest V3, popup UI, background service worker, storage utilities, and icons"
+    },
+    {
+      "timestamp": "2025-12-20T18:52:00Z",
+      "type": "IMPLEMENT",
+      "taskId": "F001",
+      "message": "Completed step 2/5: Content script with flexible DOM parser, mutation observer for dynamic content, scroll detection"
+    },
+    {
+      "timestamp": "2025-12-20T18:53:00Z",
+      "type": "IMPLEMENT",
+      "taskId": "F001",
+      "message": "Completed step 3/5: Popup UI with search, category filters, menu grid (already implemented in step 1)"
+    },
+    {
+      "timestamp": "2025-12-20T18:54:00Z",
+      "type": "IMPLEMENT",
+      "taskId": "F001",
+      "message": "Completed step 4/5: Storage with 24h TTL cache (already implemented in step 1)"
+    },
+    {
+      "timestamp": "2025-12-20T18:55:00Z",
+      "type": "IMPLEMENT",
+      "taskId": "F001",
+      "message": "Completed step 5/5: Icons (16/48/128), README, error handling and loading states. All steps complete, ready for review."
+    },
+    {
+      "timestamp": "2025-12-20T19:00:00Z",
+      "type": "REVIEW",
+      "taskId": "F001",
+      "message": "Code review: APPROVED (4/5). Security OK, MV3 compliant, minor console.log notes."
+    },
+    {
+      "timestamp": "2025-12-20T19:00:00Z",
+      "type": "COMPLETE",
+      "taskId": "F001",
+      "message": "Completed: Rostics Menu Assistant Chrome Extension. Archived to .claude-workspace/archive/2025-12-20-rostics-menu-assistant.md"
+    }
+  ],
   "decisions": [
     {
       "id": "ADR-001",
@@ -40,6 +98,34 @@
         "positive": ["Simpler mental model", "Clear linear workflow"],
         "negative": ["Some specialized commands removed"]
       }
+    },
+    {
+      "id": "ADR-004",
+      "title": "Use Manifest V3 for Chrome Extension",
+      "status": "accepted",
+      "date": "2025-12-20",
+      "context": "Google requires MV3 for all new extensions since 2024. MV2 deprecated.",
+      "decision": "Build extension with Manifest V3: service worker instead of background page, chrome.storage for data",
+      "alternatives": ["Manifest V2 - deprecated, won't work in Chrome"],
+      "consequences": {
+        "positive": ["Future-proof", "Better performance", "Required for Chrome Web Store"],
+        "negative": ["Service worker lifecycle requires careful handling"]
+      },
+      "relatedTaskId": "F001"
+    },
+    {
+      "id": "ADR-005",
+      "title": "Parse DOM instead of API calls",
+      "status": "accepted",
+      "date": "2025-12-20",
+      "context": "rostics.ru blocks automated requests (403). No public API documented.",
+      "decision": "Use content script to parse DOM when user visits rostics.ru/menu, cache data in chrome.storage",
+      "alternatives": ["Direct API calls - blocked by server", "Static data - outdated quickly"],
+      "consequences": {
+        "positive": ["Works with site's anti-bot protection", "Real-time data from actual page"],
+        "negative": ["Requires user to visit site at least once", "Parser may break on site updates"]
+      },
+      "relatedTaskId": "F001"
     }
   ]
 }
